@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.30.0](https://github.com/googleapis/gax-php/compare/v1.29.1...v1.30.0) (2024-02-28)
+
+
+### Features
+
+* Auto Populate fields configured for auto population in Rpc Request Message ([#543](https://github.com/googleapis/gax-php/issues/543)) ([99d6b89](https://github.com/googleapis/gax-php/commit/99d6b899ddf55d51fab976844c1e0f8fe9918a52))
+* Make the default authHttpHandler in CredentialsWrapper null ([#544](https://github.com/googleapis/gax-php/issues/544)) ([2a25eea](https://github.com/googleapis/gax-php/commit/2a25eeacadf2f783f64b4eca4f94e067ddef3eaa))
+
+## [1.29.1](https://github.com/googleapis/gax-php/compare/v1.29.0...v1.29.1) (2024-02-26)
+
+
+### Bug Fixes
+
+* Allow InsecureCredentialsWrapper::getAuthorizationHeaderCallback to return null ([#541](https://github.com/googleapis/gax-php/issues/541)) ([676f4f7](https://github.com/googleapis/gax-php/commit/676f4f7e3d8925d8aba00285616fdf89440b45f9))
+
+## [1.29.0](https://github.com/googleapis/gax-php/compare/v1.28.1...v1.29.0) (2024-02-26)
+
+
+### Features
+
+* Add InsecureCredentialsWrapper for Emulator connection ([#538](https://github.com/googleapis/gax-php/issues/538)) ([b5dbeaf](https://github.com/googleapis/gax-php/commit/b5dbeaf33594b300a0c678ffc6a6946b09fce7dd))
+
 ## [1.28.1](https://github.com/googleapis/gax-php/compare/v1.28.0...v1.28.1) (2024-02-20)
 
 

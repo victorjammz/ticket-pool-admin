@@ -193,30 +193,150 @@
                 </div>
                 <div
                     class="grid xl:grid-cols-4 xlg:grid-cols-3 xxmd:grid-cols-2 sm:grid-cols-2 msm:grid-cols-1 xxsm:grid-cols-1 pt-5 gap-5">
-                    @if (count($data->paid_ticket) != 0)
+                    
+                    @if($data->id == 17)
+                        @php $event = '14423ad0-fd0a-4406-b1c6-4279c6b2ef95'; @endphp
+                    @elseif($data->id == 87)
+                        @php $event = '350204c4-08e8-4e5e-bfe7-0a8b08f37a04'; @endphp
+                    @else
+                        @php $event = ''; @endphp 
+                    @endif
+                    @if(!empty($event))
+                    <input type="hidden" name="payment" id="payment" value="10">
+                    <input type="hidden" name="ticket_id" id="ticket_id" value="2">
+                    <input type="hidden" name="coupon_id" id="coupon_id" value="">
+                    <input type="hidden" name="tax" id="tax_total" value="2">
+                    <input type="hidden" id="quantity" readonly name="quantity" value="1"/>
+                    <input type="hidden" name="ticket_date" id="" value="2024-3-25"/>
+                    <input type="hidden" name="selectedSeats" id="selectedSeats">
+                    <input type="hidden" name="selectedSeatsId[]" id="selectedSeatsId">
+                    <input type="hidden" id="stripePublicKey" name="stripePublicKey"
+                    value="{{ \App\Models\PaymentSetting::find(1)->stripePublicKey }}">
+                    <div id="chart" style="width:1000px; height:450px;"></div>
+                        <script src="https://cdn-eu.seatsio.net/chart.js"></script>
+                        <script>
+                            var selectedSeats = [];
+                            new seatsio.SeatingChart({
+                                divId: 'chart',
+                                workspaceKey: '74c425c5-1af8-4ffc-9ad0-3aa488fe13a6',
+                                event: "{{$event}}",
+                                session: 'continue',
+                                pricing: [
+                                    {'category': 1, 'price': 30}, 
+                                    {'category': 2, 'price': 40}, 
+                                    {'category': 3, 'price': 50},
+                                    {'category': 4, 'price': 60},
+                                    {'category': 5, 'price': 70},
+                                    {'category': 6, 'price': 80}
+                                ],
+                                showMinimap: false,
+                                priceFormatter: function(price) {
+                                    return '£' + price;
+                                },
+                                showZoomOutButtonOnMobile: false,
+                                onObjectSelected: function (object) {
+                                    // add the selected seat id to the array
+                                    selectedSeats.push(object.label);
+                                    showPaymentbutton();                                   
+                                },
+                                onObjectDeselected: function (object) {
+                                    // remove the deselected seat id from the array
+                                    var index = selectedSeats.indexOf(object.label);
+                                    if (index !== -1) selectedSeats.splice(index, 1);
+                                    showPaymentbutton();
+                                }
+                            }).render();
+                            function showPaymentbutton(){
+                                if(selectedSeats.length > 0){
+                                    $("#pay-seatio").show();
+                                }else{
+                                    $("#pay-seatio").hide();
+                                }
+                            }
+                        </script>
+                    @else
+                        @if (count($data->paid_ticket) != 0)
 
-                        @foreach ($data->paid_ticket as $item)
-                            <div class="ticket-card relative rounded-lg border border-gray-light p-5 ">
-                                <div class="!h-auto mb-5" style="height: auto;margin-bottom:100px;">
-                                    <div class="flex justify-center">
-                                        <p class="paid-tag leading-4">{{ __('Paid') }}</p>
+                            @foreach ($data->paid_ticket as $item)
+                                <div class="ticket-card relative rounded-lg border border-gray-light p-5 ">
+                                    <div class="!h-auto mb-5" style="height: auto;margin-bottom:100px;">
+                                        <div class="flex justify-center">
+                                            <p class="paid-tag leading-4">{{ __('Paid') }}</p>
+                                        </div>
+                                        <p class="ticket-name leading-7 text-center py-4">
+                                            {{ $item->name }}</p>
+                                        <div class="ticket-price flex justify-center space-x-2">
+                                            <span
+                                                class="font-medium text-2xl leading-8 text-center text-black pt-1">{{ __($currency) }}</span>
+                                            <p class="font-medium text-5xl leading-10 text-black text-center">
+                                                {{ $item->price }}</p>
+                                        </div>
+                                        {{-- when tickets are available --}}
+                                        <div class="py-4 flex justify-center">
+                                            @if ($item->available_qty < 0)
+                                                <p class="paid-tag available-ticket text-center py-2 just-center w-fit">
+                                                    {{ __('No Available tickets') }}</p>
+                                            @else
+                                                <p class="paid-tag available-ticket text-center py-2 just-center w-fit">
+                                                    {{ $item->available_qty }}&nbsp{{ __('Available tickets') }}</p>
+                                            @endif
+                                        </div>
+                                        <div class="section-content">
+                                            <p class="font-normal text-base leading-6 text-gray text-left">
+                                                {{ $item->description }}
+                                            </p>
+                                        </div>
+                                        <p class="mt-3 font-normal text-base leading-6 text-ticket-sale text-left">
+                                            {{ __('Ticket Sale starts onwards') }}
+                                        </p>
+                                        <p class="font-normal text-base leading-6 text-orange text-left">
+                                            {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} {{__('till')}}
+                                            {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
+                                        </p>
+                                        
                                     </div>
-                                    <p class="ticket-name leading-7 text-center py-4">
-                                        {{ $item->name }}</p>
+
+                                    
+                                    @if ($item->available_qty == 0)
+                                        <div class="absolute bottom-5" style="width: 89%">
+                                            <div class="mt-7  w-full border border-primary rounded-lg flex justify-center">
+                                                <a href="#"
+                                                    class="font-medium text-base leading-6 text-primary  py-3">{{ __('Sold Out') }}</a>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <a type="button"
+                                            href="{{ url('/checkout/' . $item->id) }}"
+                                            class="common-btn orange-btn text-primary text-center font-medium text-base leading-7 w-full mt-7 flex justify-center">{{ __('View Details') }}
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+                        @endif
+                        @if (count($data->free_ticket) != 0)
+                            @foreach ($data->free_ticket as $item)
+                                <div class="ticket-card relative rounded-lg border border-gray-light p-5">
+                                    <div class="flex justify-center">
+                                        <p class="paid-tag leading-4">{{ __('Free') }}</p>
+                                    </div>
+                                    <p class="ticket-name font-medium text-xl leading-7 text-primary text-center py-4">
+                                        {{ $item->ticket_number }}</p>
                                     <div class="ticket-price flex justify-center space-x-2">
                                         <span
-                                            class="font-medium text-2xl leading-8 text-center text-black pt-1">{{ __($currency) }}</span>
+                                            class="font-medium text-2xl leading-8 text-center text-black pt-1"></span>
                                         <p class="font-medium text-5xl leading-10 text-black text-center">
-                                            {{ $item->price }}</p>
+                                            {{ __('Free') }}</p>
                                     </div>
                                     {{-- when tickets are available --}}
                                     <div class="py-4 flex justify-center">
-                                        @if ($item->available_qty < 0)
-                                            <p class="paid-tag available-ticket text-center py-2 just-center w-fit">
+                                        @if ($item->available_qty == 0)
+                                            <p
+                                                class="paid-tag font-normal text-lg leading-7 text-danger text-center rounded-full bg-danger-light py-2">
                                                 {{ __('No Available tickets') }}</p>
                                         @else
-                                            <p class="paid-tag available-ticket text-center py-2 just-center w-fit">
-                                                {{ $item->available_qty }}&nbsp{{ __('Available tickets') }}</p>
+                                            <p
+                                                class="paid-tag font-normal text-lg leading-7 text-success text-center bg-success-light rounded-full py-2">
+                                                {{ $item->available_qty . ' Available tickets' }}</p>
                                         @endif
                                     </div>
                                     <div class="section-content">
@@ -224,98 +344,41 @@
                                             {{ $item->description }}
                                         </p>
                                     </div>
-                                    <p class="mt-3 font-normal text-base leading-6 text-ticket-sale text-left">
-                                        {{ __('Ticket Sale starts onwards') }}
+                                    <p class="mt-3 font-normal text-base leading-6 text-gray text-ticket-sale text-left">
+                                        {{ __('Ticket Date') }}
                                     </p>
-                                    <p class="font-normal text-base leading-6 text-orange text-left">
-                                        {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} {{__('till')}}
+                                    <p class="font-normal text-base leading-6 text-gray text-orange text-left">
+                                        {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} -
                                         {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
                                     </p>
-                                    
-                                </div>
-
-                                
-                                @if ($item->available_qty == 0)
-                                    <div class="absolute bottom-5" style="width: 89%">
-                                        <div class="mt-7  w-full border border-primary rounded-lg flex justify-center">
-                                            <a href="#"
-                                                class="font-medium text-base leading-6 text-primary  py-3">{{ __('Sold Out') }}</a>
-                                        </div>
-                                    </div>
-                                @else
-                                    <a type="button"
-                                        href="{{ url('/checkout/' . $item->id) }}"
-                                        class="common-btn orange-btn text-primary text-center font-medium text-base leading-7 w-full mt-7 flex justify-center">{{ __('View Details') }}
-                                    </a>
-                                @endif
-                            </div>
-                        @endforeach
-                    @endif
-                    @if (count($data->free_ticket) != 0)
-                        @foreach ($data->free_ticket as $item)
-                            <div class="ticket-card relative rounded-lg border border-gray-light p-5">
-                                <div class="flex justify-center">
-                                    <p class="paid-tag leading-4">{{ __('Free') }}</p>
-                                </div>
-                                <p class="ticket-name font-medium text-xl leading-7 text-primary text-center py-4">
-                                    {{ $item->ticket_number }}</p>
-                                <div class="ticket-price flex justify-center space-x-2">
-                                    <span
-                                        class="font-medium text-2xl leading-8 text-center text-black pt-1"></span>
-                                    <p class="font-medium text-5xl leading-10 text-black text-center">
-                                        {{ __('Free') }}</p>
-                                </div>
-                                {{-- when tickets are available --}}
-                                <div class="py-4 flex justify-center">
                                     @if ($item->available_qty == 0)
-                                        <p
-                                            class="paid-tag font-normal text-lg leading-7 text-danger text-center rounded-full bg-danger-light py-2">
-                                            {{ __('No Available tickets') }}</p>
+                                        <div class="absolute bottom-5" style="width: 89%">
+                                            <div class="mt-7  w-full border border-primary rounded-lg flex justify-center">
+                                                <a href="#"
+                                                    class="font-medium text-base leading-6 text-primary  py-3">{{ __('Sold Out') }}</a>
+                                            </div>
+                                        </div>
                                     @else
-                                        <p
-                                            class="paid-tag font-normal text-lg leading-7 text-success text-center bg-success-light rounded-full py-2">
-                                            {{ $item->available_qty . ' Available tickets' }}</p>
+                                        <a type="button"
+                                                href="{{ url('/checkout/' . $item->id) }}"
+                                                class="common-btn orange-btn text-base leading-7 w-full mt-7 flex justify-center">{{ __('View Details') }}
+                                            </a>
                                     @endif
                                 </div>
-                                <div class="section-content">
-                                    <p class="font-normal text-base leading-6 text-gray text-left">
-                                        {{ $item->description }}
-                                    </p>
+                            @endforeach
+                        @endif
+                        @if (count($data->free_ticket) == 0 && count($data->paid_ticket) == 0)
+                            <div class="mx-auro w-full">
+                                <div class="px-5">
+                                    <img src="{{ url('frontend/images/empty.png') }}">
+                                    <h6 class=" font-light text-xl leading-9 text-black px-5 text-center">
+                                        {{ __('No Tickets found') }}!</h6>
                                 </div>
-                                <p class="mt-3 font-normal text-base leading-6 text-gray text-ticket-sale text-left">
-                                    {{ __('Ticket Date') }}
-                                </p>
-                                <p class="font-normal text-base leading-6 text-gray text-orange text-left">
-                                    {{ Carbon\Carbon::parse($item->start_time)->format('d M Y') }} -
-                                    {{ Carbon\Carbon::parse($item->end_time)->format('d M Y') }}
-                                </p>
-                                @if ($item->available_qty == 0)
-                                    <div class="absolute bottom-5" style="width: 89%">
-                                        <div class="mt-7  w-full border border-primary rounded-lg flex justify-center">
-                                            <a href="#"
-                                                class="font-medium text-base leading-6 text-primary  py-3">{{ __('Sold Out') }}</a>
-                                        </div>
-                                    </div>
-                                @else
-                                    <a type="button"
-                                            href="{{ url('/checkout/' . $item->id) }}"
-                                            class="common-btn orange-btn text-base leading-7 w-full mt-7 flex justify-center">{{ __('View Details') }}
-                                        </a>
-                                @endif
                             </div>
-                        @endforeach
-                    @endif
-                    @if (count($data->free_ticket) == 0 && count($data->paid_ticket) == 0)
-                        <div class="mx-auro w-full">
-                            <div class="px-5">
-                                <img src="{{ url('frontend/images/empty.png') }}">
-                                <h6 class=" font-light text-xl leading-9 text-black px-5 text-center">
-                                    {{ __('No Tickets found') }}!</h6>
-                            </div>
-                        </div>
+                        @endif
                     @endif
                 </div>
-
+                <button type="button" id="pay-seatio" onclick="stripeSession()" class="font-medium text-lg leading-6 text-white bg-primary w-full rounded-md py-3 mt-10" style="width:50%; display:none;">Pay</button>
             </div>
             {{-- review --}}
             <div class="mt-10 flex items-center">
@@ -439,6 +502,7 @@
         </div>
     </div>
     <script>
+        
         function initMap() {
             var map = new google.maps.Map(document.getElementById('map'), {
                 center: {
@@ -455,6 +519,12 @@
                 map: map
             });
         }
+        // $(document.ready(function){
+        //     $("#pay-seatio").on('click',function(){
+        //         stripeSession();
+        //     });
+        // });
+                                    
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $gmapkey }}&callback=initMap"></script>
 

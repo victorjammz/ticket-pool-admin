@@ -193,42 +193,40 @@
                 </div>
                 <div
                     class="grid xl:grid-cols-4 xlg:grid-cols-3 xxmd:grid-cols-2 sm:grid-cols-2 msm:grid-cols-1 xxsm:grid-cols-1 pt-5 gap-5">
-                    
-                    @if($data->id == 17)
-                        @php $event = '14423ad0-fd0a-4406-b1c6-4279c6b2ef95'; @endphp
-                    @elseif($data->id == 87)
-                        @php $event = '350204c4-08e8-4e5e-bfe7-0a8b08f37a04'; @endphp
-                    @else
-                        @php $event = ''; @endphp 
-                    @endif
-                    @if(!empty($event))
-                    <input type="hidden" name="payment" id="payment" value="10">
-                    <input type="hidden" name="ticket_id" id="ticket_id" value="2">
-                    <input type="hidden" name="coupon_id" id="coupon_id" value="">
-                    <input type="hidden" name="tax" id="tax_total" value="2">
-                    <input type="hidden" id="quantity" readonly name="quantity" value="1"/>
-                    <input type="hidden" name="ticket_date" id="" value="2024-3-25"/>
-                    <input type="hidden" name="selectedSeats" id="selectedSeats">
-                    <input type="hidden" name="selectedSeatsId[]" id="selectedSeatsId">
-                    <input type="hidden" id="stripePublicKey" name="stripePublicKey"
-                    value="{{ \App\Models\PaymentSetting::find(1)->stripePublicKey }}">
-                    <div id="chart" style="width:1000px; height:450px;"></div>
+                    @if(!empty($data->seatsio_eventId))
+                        @php $event = $data->seatsio_eventId; $pricing = array(); @endphp
+                        @if (count($data->paid_ticket) != 0)
+                            @foreach ($data->paid_ticket as $item)
+                                @php 
+                                    $pricing[] = array(
+                                        'category' => $item->ticket_key,
+                                        'price' => $item->price
+                                    );
+                                @endphp
+                            @endforeach
+                        @endif
+                        @if (count($data->free_ticket) != 0)
+                            @foreach ($data->free_ticket as $item)
+                                @php 
+                                    $pricing[] = array(
+                                        'category' => $item->ticket_key,
+                                        'price' => $item->price
+                                    );
+                                @endphp
+                            @endforeach
+                        @endif
+                        @php $json_pricing = json_encode($pricing, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); @endphp
+                        <div id="chart" style="width:1000px; height:450px;"></div>
                         <script src="https://cdn-eu.seatsio.net/chart.js"></script>
                         <script>
-                            var selectedSeats = [];
+                            var selectedSeats = {};
+                            var pricing = {!! $json_pricing !!};
                             new seatsio.SeatingChart({
                                 divId: 'chart',
                                 workspaceKey: '74c425c5-1af8-4ffc-9ad0-3aa488fe13a6',
                                 event: "{{$event}}",
                                 session: 'continue',
-                                pricing: [
-                                    {'category': 1, 'price': 30}, 
-                                    {'category': 2, 'price': 40}, 
-                                    {'category': 3, 'price': 50},
-                                    {'category': 4, 'price': 60},
-                                    {'category': 5, 'price': 70},
-                                    {'category': 6, 'price': 80}
-                                ],
+                                pricing: pricing,
                                 showMinimap: false,
                                 priceFormatter: function(price) {
                                     return '£' + price;
@@ -236,22 +234,30 @@
                                 showZoomOutButtonOnMobile: false,
                                 onObjectSelected: function (object) {
                                     // add the selected seat id to the array
-                                    selectedSeats.push(object.label);
-                                    showPaymentbutton();                                   
+                                    var ticketKey = object.category.key;
+                                    selectedSeats[ticketKey] = (selectedSeats[ticketKey] || 0) + 1; // Increment count or initialize to 1
+                                    showPaymentbutton();
                                 },
                                 onObjectDeselected: function (object) {
                                     // remove the deselected seat id from the array
-                                    var index = selectedSeats.indexOf(object.label);
-                                    if (index !== -1) selectedSeats.splice(index, 1);
+                                    var ticketKey = object.category.key;
+                                    if (selectedSeats[ticketKey]) {
+                                        selectedSeats[ticketKey]--;
+                                        if (selectedSeats[ticketKey] === 0) {
+                                            delete selectedSeats[ticketKey];
+                                        }
+                                    }
                                     showPaymentbutton();
                                 }
                             }).render();
                             function showPaymentbutton(){
-                                if(selectedSeats.length > 0){
+                                if(Object.keys(selectedSeats).length > 0){
                                     $("#pay-seatio").show();
-                                }else{
+                                } else {
                                     $("#pay-seatio").hide();
                                 }
+                                $("#selectedSeatsInput").val(JSON.stringify(selectedSeats));
+                                // console.log('Selected Seats:', selectedSeats);
                             }
                         </script>
                     @else
@@ -378,7 +384,12 @@
                         @endif
                     @endif
                 </div>
-                <button type="button" id="pay-seatio" onclick="stripeSession()" class="font-medium text-lg leading-6 text-white bg-primary w-full rounded-md py-3 mt-10" style="width:50%; display:none;">Pay</button>
+                <form id="seatSelectionForm" action="{{ route('checkout') }}" method="POST">
+                    @csrf                    
+                    <input type="hidden" id="seatsio_eventId" name="seatsio_eventId" value="{{$data->seatsio_eventId}}">
+                    <input type="hidden" id="selectedSeatsInput" name="selectedSeats">
+                    <button type="submit" id="pay-seatio" class="font-medium text-lg leading-6 text-white bg-primary w-full rounded-md py-3 mt-10" style="width:50%; display:none;">Proceed</button>
+                </form>
             </div>
             {{-- review --}}
             <div class="mt-10 flex items-center">

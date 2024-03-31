@@ -941,12 +941,11 @@ class FrontendController extends Controller
                 $data['ticket'][$key]['tax'] = Tax::where([['allow_all_bill', 1], ['status', 1]])->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
                 foreach ($data['ticket'][$key]['tax'] as $key => $item) {
                     if ($item->amount_type == 'percentage') {
-
                         $amount = ($item->price * $ticket['price']) / 100;
                         array_push($arr, $amount);
                     }
                     if ($item->amount_type == 'price') {
-                        $amount = $ticket['price'];
+                        $amount = $item->price;
                         array_push($arr, $amount);
                     }
                 }
@@ -972,7 +971,7 @@ class FrontendController extends Controller
             $data['totalAmountTax'] = (Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price')) * $totalTickets;
             $data = (object) $data;
         }
-
+        //dd($data);
         return view('frontend.checkoutseatio', compact('data'));
     }
     public function applyCoupon(Request $request)

@@ -24,6 +24,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ApiController;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -195,9 +196,12 @@ Route::post('/email/{id}/resend', [EmailTemplateController::class, 'resendEmail'
 Route::get('testing-email',[EmailTemplateController::class,'testEmail']);
 
 // Checkout process
-Route::get('/checkout-process', [CheckoutController::class, 'index'])->name('checkout');
+// Route::get('/checkout-process', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout-process', [CheckoutController::class, 'index'])->name('checkout');
 Route::get('/detail-view', [CheckoutController::class, 'detail_view'])->name('detail_view');
 Route::get('/additional-detail-view', [CheckoutController::class, 'additional_detail_view'])->name('additional_detail_view');
 Route::post('/detail-post', [CheckoutController::class, 'detail_post'])->name('detail_post');
 Route::post('/register-process', [CheckoutController::class, 'register_process'])->name('register_post');
 Route::get('/payment-detail-view', [CheckoutController::class, 'payment_detail_view'])->name('payment_detail_view');
+Route::get('/checkout-payment', [CheckoutController::class, 'checkout_process'])->name('checkout_payment');
+// Route::post('/user/register', [ApiController::class, 'userRegister'])->name('user.register');

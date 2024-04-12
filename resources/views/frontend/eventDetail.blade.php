@@ -241,24 +241,35 @@
                                 showZoomOutButtonOnMobile: false,
                                 onObjectSelected: function (object) {
                                     // add the selected seat id to the array
+                                    console.log('Selected Object:', object);
                                     seatsIoIds.push(object.label);
+                                    // Get the ticket category key and price of the selected seat
                                     var ticketKey = object.category.key;
+                                    var seatPrice = parseFloat(object.category.pricing['price']);
                                     // Increment count and add selected seat label
-                                    if (!selectedSeats.hasOwnProperty(ticketKey)) {
-                                    selectedSeats[ticketKey] = { count: 0, seats: [] };
-                                }
-                                    selectedSeats[ticketKey].count++;
-                                    selectedSeats[ticketKey].seats.push(object.label);
-                                    showPaymentbutton();
+                                    if (seatPrice && !isNaN(seatPrice)) {
+                                        if (!selectedSeats.hasOwnProperty(ticketKey)) {
+                                            selectedSeats[ticketKey] = { count: 0, totalPrice: 0, seats: [] };
+                                        }
+                                        selectedSeats[ticketKey].count++;
+                                        selectedSeats[ticketKey].totalPrice += seatPrice;
+                                        selectedSeats[ticketKey].seats.push(object.label);
+                                        showPaymentbutton();
+                                    } else {
+                                        console.error('Invalid seat price:', object.category.price);
+                                    }
                                 },
                                 onObjectDeselected: function (object) {
                                     // remove the deselected seat id from the array
                                     var index = seatsIoIds.indexOf(object.label);
                                     if (index !== -1) seatsIoIds.splice(index, 1);
 
+                                    // Get the ticket category key and price of the deselected seat
                                     var ticketKey = object.category.key;
+                                    var seatPrice = parseFloat(object.category.pricing['price']);
                                     if (selectedSeats.hasOwnProperty(ticketKey) && selectedSeats[ticketKey].count > 0) {
                                         selectedSeats[ticketKey].count--;
+                                        selectedSeats[ticketKey].totalPrice -= seatPrice;
                                         selectedSeats[ticketKey].seats.splice(selectedSeats[ticketKey].seats.indexOf(object.label), 1);
                                         if (selectedSeats[ticketKey].count === 0) {
                                             delete selectedSeats[ticketKey];
@@ -273,9 +284,71 @@
                                 } else {
                                     $("#pay-seatio").hide();
                                 }
+                                var totalPrice = 0;
+                                var totalSeats = 0;
+                                for (var key in selectedSeats) {
+                                    totalPrice += selectedSeats[key].totalPrice;
+                                    totalSeats += selectedSeats[key].count;
+                                }
+                                $("#selectedSeatsTotalPrice").val(totalPrice);
+                                $("#selectedSeatsTotalNumber").val(totalSeats);
                                 $("#selectedSeatsInput").val(JSON.stringify(selectedSeats));
                                 $("#seatsIoIds").val(JSON.stringify(seatsIoIds));
                                 console.log('Selected Seats:', selectedSeats);
+                                var data = {
+                                    totalPrice: totalPrice,
+                                    totalSeats: totalSeats
+                                };
+
+                                // Convert the data object to a JSON string
+                                var jsonData = JSON.stringify(data);
+
+                                // Save the JSON string to localStorage under a key, for example, 'seatsData'
+                                localStorage.setItem('seatsData', jsonData);
+
+
+                                // Get the current date and time
+                                const now = new Date();
+
+                                // Format the current date and time
+                                const formattedDateTime = formatDateTime(now);
+                                localStorage.setItem('orderDate', formattedDateTime);
+                            }
+                            function formatDateTime(date) {
+                                const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                                const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                                // Get day of the week, month, day of the month, hour, and minutes
+                                const dayOfWeek = daysOfWeek[date.getDay()];
+                                const month = monthsOfYear[date.getMonth()];
+                                const dayOfMonth = date.getDate();
+                                const hour = date.getHours() % 12 || 12; // Convert 0 to 12 for 12-hour format
+                                const minutes = ('0' + date.getMinutes()).slice(-2); // Add leading zero if needed
+
+                                // Determine AM/PM
+                                const ampm = date.getHours() >= 12 ? 'pm' : 'am';
+
+                                // Add suffix for day of the month (e.g., 1st, 2nd, 3rd, 4th, etc.)
+                                let daySuffix;
+                                switch (dayOfMonth % 10) {
+                                    case 1:
+                                        daySuffix = 'st';
+                                        break;
+                                    case 2:
+                                        daySuffix = 'nd';
+                                        break;
+                                    case 3:
+                                        daySuffix = 'rd';
+                                        break;
+                                    default:
+                                        daySuffix = 'th';
+                                        break;
+                                }
+
+                                // Construct the formatted date string
+                                const formattedDateTime = `${dayOfWeek}, ${dayOfMonth}${daySuffix} ${month} at ${hour}:${minutes}${ampm}`;
+
+                                return formattedDateTime;
                             }
                         </script>
                     @else
@@ -402,11 +475,13 @@
                         @endif
                     @endif
                 </div>
-                <form id="seatSelectionForm" action="{{ route('checkout') }}" method="GET">
+                <form id="seatSelectionForm" action="{{ route('checkout') }}" method="POST">
                     @csrf
                     <input type="hidden" id="seatsio_eventId" name="seatsio_eventId" value="{{$data->seatsio_eventId}}">
                     <input type="hidden" id="selectedSeatsInput" name="selectedSeats">
                     <input type="hidden" id="seatsIoIds" name="seatsIoIds">
+                    <input type="hidden" id="selectedSeatsTotalPrice" name="selectedSeatsTotalPrice">
+                    <input type="hidden" id="selectedSeatsTotalNumber" name="selectedSeatsTotalNumber">
                     <button type="submit" id="pay-seatio" class="font-medium text-lg leading-6 text-white bg-primary w-full rounded-md py-3 mt-10" style="width:50%; display:none;">Proceed</button>
                 </form>
             </div>

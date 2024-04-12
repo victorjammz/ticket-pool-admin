@@ -307,9 +307,16 @@ class FrontendController extends Controller
                         'url' => url('organizer/VerificationConfirm/' .  $user->id)
                     ];
                 } else {
+                    /*
                     $details = [
                         'url' => url('user/VerificationConfirm/' .  $user->id)
                     ];
+                    */
+                    $checkout_process = $request->has('checkout_process') ? 1 : 0;
+                    $details = [
+                        'url' => url('user/VerificationConfirm/' .  $user->id . '/' . $checkout_process)
+                    ];
+
                 }
                 Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
                 return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);

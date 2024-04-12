@@ -8,7 +8,7 @@
         </div>
 
         <div class="mt-5 w-full">
-            <form class="space-y-6" action="#" method="POST">
+            <form class="space-y-6" action="{{route('checkout_payment')}}" method="GET">
                 <div class="flex items-center mb-4" style="margin-top: 20px">
                     <input id="card" name="payment" type="radio" value="card" class="w-5 h-5 appearance-none border cursor-pointer border-gray-300  rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100">
                     <label for="card" class="text-sm font-norma cursor-pointer text-gray-600"> Card</label>

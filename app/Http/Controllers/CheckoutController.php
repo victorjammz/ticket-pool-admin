@@ -13,10 +13,14 @@ use Illuminate\Support\Facades\Route;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Verify if user is already authenticated
         $user = Auth::user();
+
+        $currentDateTime = date('D, jS M \a\t g:ia');
+        $request->session()->put('currentDataTime', $currentDateTime);
+        $request->session()->put('order_details', $request->all());
 
         if (Auth::guard('appuser')->check()) {
             return view('frontend.checkout.paymentDetail');
@@ -90,9 +94,6 @@ class CheckoutController extends Controller
             return redirect()->back()->withErrors('Validation failed. Please check your input.')->withInput();
         }
 
-        // Hash the password
-        $hashedPassword = Hash::make($request->input('password'));
-
         // Save to session
         $request->session()->put('user_details', [
             'firstname' => $request->input('firstname'),
@@ -100,7 +101,7 @@ class CheckoutController extends Controller
             'gender' => $request->input('gender'),
             'birthday' => $request->input('birthday'),
             'postcode' => $request->input('postcode'),
-            'password' => $hashedPassword, // Save the hashed password
+            'password' => $request->input('password'),
             'tos' => $request->input('tos'),
         ]);
 
@@ -129,44 +130,34 @@ class CheckoutController extends Controller
 
         // register process
         $userDetails = $request->session()->get('user_details', []);
-        $response = Route::dispatch(
-            Request::create('/user/register', 'POST', [
-                'first_name'    => $userDetails['firstname'],
-                'last_name'     => $userDetails['lastname'],
-                'email'         => $request->session()->get('email'),
-                'password'      => $userDetails['password'],
-                'phone'         => $userDetails['contactNumber'],
-                'Countrycode'   => '0',
-                'Country'       => $userDetails['country'],
-                'Gender'        => $userDetails['gender'],
-                'DateOfBirth'   => $userDetails['birthday'],
-                'city'          => $userDetails['city'],
-                'checkout_process' => 1,
-            ])
-        );
+        return redirect()->route('user.customRegister', [
+            'name'      => $userDetails['firstname'],
+            'last_name'       => $userDetails['lastname'],
+            'email'           => $request->session()->get('email'),
+            'password'        => $userDetails['password'],
+            'phone'           => $userDetails['contactNumber'],
+            'Countrycode'     => '0',
+            'Country'         => $userDetails['country'],
+            'Gender'          => $userDetails['gender'],
+            'DateOfBirth'     => $userDetails['birthday'],
+            'city'            => $userDetails['city'],
+            'user_type'         => 'user',
+            'checkout_process' => 1,
+        ]);
 
-        $jsonResponse = json_decode($response->content(), true);
-        // Use the response data
-        if ($response->getStatusCode() === 200) {
-            return redirect()->route('payment_detail_view');
-        } else {
-            $errorMessage = $jsonResponse['error']['message'];
-            return redirect()->back()->withErrors($errorMessage)->withInput();
-        }
+
+        // $jsonResponse = json_decode($response->content(), true);
+        // // Use the response data
+        // if ($response->getStatusCode() === 200) {
+        //     return redirect()->route('payment_detail_view');
+        // } else {
+        //     $errorMessage = $jsonResponse['error']['message'];
+        //     return redirect()->back()->withErrors($errorMessage)->withInput();
+        // }
     }
 
     public function checkout_process(Request $request)
     {
-        // Validate the form data
-        $request->validate([
-            // Add validation rules for your form fields here
-        ]);
-
-        // user session info
-
-        // payment process with API
-
-        // Move to homepage
-        return redirect()->route('home');
+        return redirect()->route('frontend.checkout');
     }
 }

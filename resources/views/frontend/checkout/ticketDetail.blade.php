@@ -1,7 +1,7 @@
 <div class="flex flex-row justify-between">
     <div class="flex flex-col" style="width:70%">
         <h4 class="relative font-bold"><span id="eventTitle"> {{ $data->event->name }}</span> &#x1F31E;</h4>
-        <p id="order_date">{{$data->currentDateTime}}</p>
+        <p id="order_date">{{ date('D, jS M \a\t g:ia', strtotime($data->event->start_time)) }}</p>
         {{-- @if ($data->allday == 0)
             <div>
                 <input type="date" name="ticket_date" id="onetime" data-date="{{ $data->event->end_time }}" placeholder="mm/dd/yy" class="mt-3 border p-2 border-gray-light">

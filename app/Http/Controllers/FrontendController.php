@@ -166,18 +166,23 @@ class FrontendController extends Controller
             'email' => 'bail|required|email',
             'password' => 'bail|required',
         ]);
-
         $userdata = array(
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => $request->pwd ? $request->pwd : $request->password,
         );
         $remember = $request->get('remember');
+        if($request->checkout_process == 1) {
+            $remember = false;
+        }
         if ($request->type == 'user') {
             $res = Auth::guard('appuser')->attempt($userdata, $remember);
             $user =  Auth::guard('appuser')->user();
-            if (Auth::guard('appuser')->attempt($userdata, $remember)) {
+            if ($res) {
                 $user =  Auth::guard('appuser')->user();
                 $setting = Setting::first(['app_name', 'logo']);
+                if ($request->pwd) {
+                    return redirect()->route('payment_detail_view');
+                }
                 if ($user->status == 0) {
                     return redirect('user/login')->with('error_msg', 'Blocked By Admin.');
                 }
@@ -276,6 +281,7 @@ class FrontendController extends Controller
         $verify = Setting::first()->user_verify == 1 ? 0 : 1;
         $data = $request->all();
         $data['password'] = Hash::make($request->password);
+        $pwd = $request->password;
         $data['image'] = "defaultuser.png";
         $data['status'] = 1;
         $data['provider'] = "LOCAL";
@@ -302,13 +308,15 @@ class FrontendController extends Controller
         if ($user->is_verify == 0) {
 
             if (Setting::first()->verify_by == 'email' && Setting::first()->mail_host != NULL) {
+                $details = [];
                 if ($data['user_type'] == 'organizer') {
                     $details = [
                         'url' => url('organizer/VerificationConfirm/' .  $user->id)
                     ];
                 } else {
+                    $password = $request->has('checkout_process') ? $pwd : 0;
                     $details = [
-                        'url' => url('user/VerificationConfirm/' .  $user->id)
+                        'url' => url('user/VerificationConfirm/' .  $user->id . '/' . $password)
                     ];
                 }
                 Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
@@ -364,7 +372,7 @@ class FrontendController extends Controller
         }
         return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
     }
-    public function LoginByMail($id, $checkout)
+    public function LoginByMail($id, $password)
     {
         $user = AppUser::find($id);
         if (Auth::guard('appuser')->loginUsingId($id)) {
@@ -374,8 +382,13 @@ class FrontendController extends Controller
             $verify->is_verify = 1;
             $verify->update();
             $this->setLanguage($user);
-            if($checkout == 1) {
-               return redirect()->route('payment_detail_view');
+            if ($password) {
+                return redirect()->route('user.customLogin', [
+                    'email'            => $user->email,
+                    'password'         => $user->password,
+                    'pwd'              => $password,
+                    'type'             => 'user'
+                ]);
             }
             return redirect('/');
         }
@@ -759,41 +772,41 @@ class FrontendController extends Controller
         $setting = Setting::first(['app_name', 'logo']);
         $data = User::find($id);
 
-        SEOMeta::setTitle(($data->first_name ?? '') . ' ' .($data->last_name ?? ''))
+        SEOMeta::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''))
             ->setDescription($data->bio)
             ->addKeyword([
                 $setting->app_name,
                 $data->name,
-                ($data->first_name ?? '') . ' ' .($data->last_name ?? ''),
+                ($data->first_name ?? '') . ' ' . ($data->last_name ?? ''),
             ]);
 
-        OpenGraph::setTitle(($data->first_name ??'') . ' ' . $data->last_name ?? '')
+        OpenGraph::setTitle(($data->first_name ?? '') . ' ' . $data->last_name ?? '')
             ->setDescription($data->bio)
             ->setType('profile')
             ->setUrl(url()->current())
             ->addImage($data->imagePath . $data->image)
             ->setProfile([
                 'first_name' => ($data->first_name ?? ''),
-                'last_name' =>($data->last_name ?? ''),
+                'last_name' => ($data->last_name ?? ''),
                 'username' => $data->name,
                 'email' => $data->email,
                 'bio' => $data->bio,
                 'country' => $data->country,
             ]);
 
-        JsonLd::setTitle(($data->first_name ?? '') . ' ' .( $data->last_name ?? ''))
+        JsonLd::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''))
             ->setDescription($data->bio)
             ->setType('Profile')
             ->addImage($data->imagePath . $data->image);
 
-        SEOTools::setTitle(($data->first_name ?? '' ). ' ' .( $data->last_name ?? ''));
+        SEOTools::setTitle(($data->first_name ?? '') . ' ' . ($data->last_name ?? ''));
         SEOTools::setDescription($data->bio);
         SEOTools::opengraph()->setUrl(url()->current());
         SEOTools::setCanonical(url()->current());
         SEOTools::opengraph()->addProperty('keywords', [
             $setting->app_name,
             $data->name,
-            ($data->first_name ?? '' ). ' ' .( $data->last_name ?? ''),
+            ($data->first_name ?? '') . ' ' . ($data->last_name ?? ''),
         ]);
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         SEOTools::jsonLd()->addImage($data->imagePath . $data->image);
@@ -889,73 +902,71 @@ class FrontendController extends Controller
 
     public function checkoutseatsio(Request $request)
     {
-        $selectedSeats = json_decode($request->selectedSeats,true);
+        $selectedSeats = json_decode($request->selectedSeats, true);
         // $seatsIoIds = json_decode($request->seatsIoIds,true);
         $seatKeys = array_keys($selectedSeats);
         $eventDetails = Event::with(['ticket' => function ($query) use ($seatKeys) {
-                            // Apply the where condition on the ticket relationship
-                            $query->whereIn('ticket_key',$seatKeys);
-                        }])->where('seatsio_eventId',$request->seatsio_eventId)->first();
+            // Apply the where condition on the ticket relationship
+            $query->whereIn('ticket_key', $seatKeys);
+        }])->where('seatsio_eventId', $request->seatsio_eventId)->first();
 
         $data = array();
         $data['event'] = $eventDetails;
         $totalTickets = 0;
-        if(!empty($eventDetails['ticket'])){
+        if (!empty($eventDetails['ticket'])) {
             $setting = Setting::first();
-            foreach($eventDetails['ticket'] as $key => $ticket){
+            foreach ($eventDetails['ticket'] as $key => $ticket) {
                 try {
-                $totalTickets += $selectedSeats[$ticket['ticket_key']]['count'];
+                    $totalTickets += $selectedSeats[$ticket['ticket_key']]['count'];
 
-                $data['ticket'][$key] = $ticket;
-                $data['ticket'][$key]['selectedseatsCount'] = $selectedSeats[$ticket['ticket_key']]['count'];
-                $data['ticket'][$key]['selectedseatsPrice'] = $selectedSeats[$ticket['ticket_key']]['count'] * $ticket['price'];
+                    $data['ticket'][$key] = $ticket;
+                    $data['ticket'][$key]['selectedseatsCount'] = $selectedSeats[$ticket['ticket_key']]['count'];
+                    $data['ticket'][$key]['selectedseatsPrice'] = $selectedSeats[$ticket['ticket_key']]['count'] * $ticket['price'];
 
-                SEOMeta::setTitle($ticket['name'])
-                ->setDescription($ticket['description'])
-                ->addKeyword([
-                    $setting->app_name,
-                    $ticket['name'],
-                    $data['event']['name'],
-                    $data['event']['tags']
-                ]);
+                    SEOMeta::setTitle($ticket['name'])
+                        ->setDescription($ticket['description'])
+                        ->addKeyword([
+                            $setting->app_name,
+                            $ticket['name'],
+                            $data['event']['name'],
+                            $data['event']['tags']
+                        ]);
 
-                OpenGraph::setTitle($ticket['name'])
-                    ->setDescription($ticket['description'])
-                    ->setUrl(url()->current());
+                    OpenGraph::setTitle($ticket['name'])
+                        ->setDescription($ticket['description'])
+                        ->setUrl(url()->current());
 
-                JsonLd::setTitle($ticket['name'])
-                    ->setDescription($ticket['description']);
+                    JsonLd::setTitle($ticket['name'])
+                        ->setDescription($ticket['description']);
 
-                SEOTools::setTitle($ticket['name']);
-                SEOTools::setDescription($ticket['description']);
-                SEOTools::opengraph()->setUrl(url()->current());
-                SEOTools::setCanonical(url()->current());
-                SEOTools::opengraph()->addProperty('keywords', [
-                    $setting->app_name,
-                    $ticket['name'],
-                    $data['event']['name'],
-                    $data['event']['tags']
-                ]);
-                SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
+                    SEOTools::setTitle($ticket['name']);
+                    SEOTools::setDescription($ticket['description']);
+                    SEOTools::opengraph()->setUrl(url()->current());
+                    SEOTools::setCanonical(url()->current());
+                    SEOTools::opengraph()->addProperty('keywords', [
+                        $setting->app_name,
+                        $ticket['name'],
+                        $data['event']['name'],
+                        $data['event']['tags']
+                    ]);
+                    SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
 
-                $arr = [];
-                $used = Order::where('ticket_id', $ticket['id'])->sum('quantity');
-                $data['ticket'][$key]['available_qty'] = $ticket['quantity'] - $used;
-                $data['ticket'][$key]['tax'] = Tax::where([['allow_all_bill', 1], ['status', 1]])->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
-                foreach ($data['ticket'][$key]['tax'] as $key => $item) {
-                    if ($item->amount_type == 'percentage') {
-                        $amount = ($item->price * $ticket['price']) / 100;
-                        array_push($arr, $amount);
+                    $arr = [];
+                    $used = Order::where('ticket_id', $ticket['id'])->sum('quantity');
+                    $data['ticket'][$key]['available_qty'] = $ticket['quantity'] - $used;
+                    $data['ticket'][$key]['tax'] = Tax::where([['allow_all_bill', 1], ['status', 1]])->orderBy('id', 'DESC')->get()->makeHidden(['created_at', 'updated_at']);
+                    foreach ($data['ticket'][$key]['tax'] as $key => $item) {
+                        if ($item->amount_type == 'percentage') {
+                            $amount = ($item->price * $ticket['price']) / 100;
+                            array_push($arr, $amount);
+                        }
+                        if ($item->amount_type == 'price') {
+                            $amount = $item->price;
+                            array_push($arr, $amount);
+                        }
                     }
-                    if ($item->amount_type == 'price') {
-                        $amount = $item->price;
-                        array_push($arr, $amount);
-                    }
-                }
-                $data['ticket'][$key]['singletax_total'] = array_sum($arr);
-                $data['ticket'][$key]['singletax_total'] = round($data['ticket'][$key]['singletax_total'], 2);
-
-
+                    $data['ticket'][$key]['singletax_total'] = array_sum($arr);
+                    $data['ticket'][$key]['singletax_total'] = round($data['ticket'][$key]['singletax_total'], 2);
                 } catch (\Throwable $th) {
                     \Log::error($th);
                 }
@@ -974,8 +985,17 @@ class FrontendController extends Controller
             $data['totalAmountTax'] = (Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price')) * $totalTickets;
             $data = (object) $data;
         }
-        // dd($data);
-        return view('frontend.checkoutseatio', compact('data'));
+        // return view('frontend.checkoutseatio', compact('data'));
+
+        $currentDateTime = date('D, jS M \a\t g:ia');
+        $data->currentDateTime = $currentDateTime;
+        $request->session()->put('data', $data);
+
+        if (Auth::guard('appuser')->check()) {
+            return view('frontend.checkout.paymentDetail', compact('data'));
+        } else {
+            return view('frontend.checkout.expressCheckout', compact('data'));
+        }
     }
     public function applyCoupon(Request $request)
     {
@@ -1908,7 +1928,7 @@ class FrontendController extends Controller
     }
     public function eventsByTag($tag)
     {
-        $events = Event::where([['tags', 'LIKE', "%$tag%"],['is_deleted', 0]])->get();
+        $events = Event::where([['tags', 'LIKE', "%$tag%"], ['is_deleted', 0]])->get();
         $onlinecount = 0;
         $offlinecount = 0;
         foreach ($events as $key => $value) {
@@ -2047,9 +2067,9 @@ class FrontendController extends Controller
         $request = Session::get('request');
         $ticket = Ticket::findOrFail($request['ticket_id']);
         $ticketIds = null;
-        if(!empty($request['selectedSeatsIo'])){
+        if (!empty($request['selectedSeatsIo'])) {
             $ticketIds = $request['ticket_id'];
-            $request['ticket_id'] = explode(',',$request['ticket_id'])[0];
+            $request['ticket_id'] = explode(',', $request['ticket_id'])[0];
             $ticket = Ticket::findOrFail($request['ticket_id']);
         }
 
@@ -2106,13 +2126,13 @@ class FrontendController extends Controller
                 }
             }
         }
-        if(!empty($request['selectedSeatsIo']) && count(json_decode($request['selectedSeatsIo'],true)) > 0){
-            $selectSeatsCode = json_decode($request['seatsIoIds'],true);
-            $ticketIdArray = explode(',',$ticketIds);
-            $allTickets = Ticket::whereIn('id',$ticketIdArray)->get();
-            $selectedSeatsIocounts = json_decode($request['selectedSeatsIo'],true);
+        if (!empty($request['selectedSeatsIo']) && count(json_decode($request['selectedSeatsIo'], true)) > 0) {
+            $selectSeatsCode = json_decode($request['seatsIoIds'], true);
+            $ticketIdArray = explode(',', $ticketIds);
+            $allTickets = Ticket::whereIn('id', $ticketIdArray)->get();
+            $selectedSeatsIocounts = json_decode($request['selectedSeatsIo'], true);
             $key = 0;
-            foreach($allTickets as $ticket){
+            foreach ($allTickets as $ticket) {
                 $totalTickets = $selectedSeatsIocounts[$ticket['ticket_key']]['count'];
                 for ($i = 1; $i <= $totalTickets; $i++) {
                     $child['ticket_number'] = uniqid();
@@ -2125,7 +2145,7 @@ class FrontendController extends Controller
                 }
                 $key = 0;
             }
-        }else{
+        } else {
             for ($i = 1; $i <= $request['quantity']; $i++) {
                 $child['ticket_number'] = uniqid();
                 $child['ticket_id'] = $request['ticket_id'];
@@ -2226,9 +2246,9 @@ class FrontendController extends Controller
             }
         }
 
-        if(!empty($request['seatsIoIds']) && count(json_decode($request['seatsIoIds'],true)) > 0){
+        if (!empty($request['seatsIoIds']) && count(json_decode($request['seatsIoIds'], true)) > 0) {
             $seatsioClient = new SeatsioClient(Region::EU(), '64c09328-4e37-4e06-82f4-e173a5d0e1f2');
-            $seatsioClient->events->book($event->seatsio_eventId, json_decode($request['seatsIoIds'],true));
+            $seatsioClient->events->book($event->seatsio_eventId, json_decode($request['seatsIoIds'], true));
         }
 
         Session::forget('request');

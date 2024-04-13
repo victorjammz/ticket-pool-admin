@@ -72,7 +72,7 @@ class User extends Authenticatable
     {
         return url('images/upload') . '/' . $this->attributes['image'];
     }
-    
+
     public function events()
     {
         return $this->hasMany(Event::class);

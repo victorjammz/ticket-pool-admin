@@ -13,22 +13,21 @@ use Illuminate\Support\Facades\Route;
 
 class CheckoutController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         // Verify if user is already authenticated
-        $user = Auth::user();
-
+        $data = $request->session()->get('data');
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         } else {
-            return view('frontend.checkout.expressCheckout');
+            return view('frontend.checkout.expressCheckout', compact('data'));
         }
     }
 
     public function detail_view(Request $request)
     {
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
         // Validate the form data
         $validatedData = $request->validate([
@@ -47,28 +46,30 @@ class CheckoutController extends Controller
             // Email already exists, redirect to signin page
             return redirect()->route('login');
         } else {
+            $data = $request->session()->get('data');
             $request->session()->put('email', $email);
             // Email is new, move to detail page
-            return view('frontend.checkout.detail');
+            return view('frontend.checkout.detail', compact('data'));
         }
     }
 
     public function additional_detail_view(Request $request)
     {
+        $data = $request->session()->get('data');
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
-
         $phone = Country::get();
 
-        return view('frontend.checkout.additionalDetail', compact('phone'));
+        return view('frontend.checkout.additionalDetail', compact('phone', 'data'));
     }
 
 
     public function payment_detail_view(Request $request)
     {
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            $data = $request->session()->get('data');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
         return redirect()->route('login');
     }
@@ -90,9 +91,6 @@ class CheckoutController extends Controller
             return redirect()->back()->withErrors('Validation failed. Please check your input.')->withInput();
         }
 
-        // Hash the password
-        $hashedPassword = Hash::make($request->input('password'));
-
         // Save to session
         $request->session()->put('user_details', [
             'firstname' => $request->input('firstname'),
@@ -100,7 +98,7 @@ class CheckoutController extends Controller
             'gender' => $request->input('gender'),
             'birthday' => $request->input('birthday'),
             'postcode' => $request->input('postcode'),
-            'password' => $hashedPassword, // Save the hashed password
+            'password' => $request->input('password'),
             'tos' => $request->input('tos'),
         ]);
 
@@ -114,7 +112,7 @@ class CheckoutController extends Controller
         $validatedData  = $request->validate([
             'country'       => 'required|string|max:255',
             'city'          => 'required|string|max:255',
-            'contactNumber' => ['required', 'regex:/^\+(?:[0-9] ?){6,14}[0-9]$/'],
+            'contactNumber' => ['required', 'regex:/^(?:[0-9] ?){6,14}[0-9]$/'],
             'howtoknow'     => 'required|string|max:255',
         ]);
 
@@ -129,44 +127,24 @@ class CheckoutController extends Controller
 
         // register process
         $userDetails = $request->session()->get('user_details', []);
-        $response = Route::dispatch(
-            Request::create('/user/register', 'POST', [
-                'first_name'    => $userDetails['firstname'],
-                'last_name'     => $userDetails['lastname'],
-                'email'         => $request->session()->get('email'),
-                'password'      => $userDetails['password'],
-                'phone'         => $userDetails['contactNumber'],
-                'Countrycode'   => '0',
-                'Country'       => $userDetails['country'],
-                'Gender'        => $userDetails['gender'],
-                'DateOfBirth'   => $userDetails['birthday'],
-                'city'          => $userDetails['city'],
-                'checkout_process' => 1,
-            ])
-        );
-
-        $jsonResponse = json_decode($response->content(), true);
-        // Use the response data
-        if ($response->getStatusCode() === 200) {
-            return redirect()->route('payment_detail_view');
-        } else {
-            $errorMessage = $jsonResponse['error']['message'];
-            return redirect()->back()->withErrors($errorMessage)->withInput();
-        }
+        return redirect()->route('user.customRegister', [
+            'name'            => $userDetails['firstname'],
+            'last_name'       => $userDetails['lastname'],
+            'email'           => $request->session()->get('email'),
+            'password'        => $userDetails['password'],
+            'phone'           => $userDetails['contactNumber'],
+            'Countrycode'     => '0',
+            'Country'         => $userDetails['country'],
+            'Gender'          => $userDetails['gender'],
+            'DateOfBirth'     => $userDetails['birthday'],
+            'city'            => $userDetails['city'],
+            'user_type'       => 'user',
+            'checkout_process' => 1,
+        ]);
     }
 
     public function checkout_process(Request $request)
     {
-        // Validate the form data
-        $request->validate([
-            // Add validation rules for your form fields here
-        ]);
-
-        // user session info
-
-        // payment process with API
-
-        // Move to homepage
-        return redirect()->route('home');
+        // return view('frontend.checkout');
     }
 }

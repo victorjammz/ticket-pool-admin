@@ -223,7 +223,10 @@
                         <div id="chart" style="width:1000px; height:450px;"></div>
                         <script src="https://cdn-eu.seatsio.net/chart.js"></script>
                         <script>
-
+                            var event_title = '<?php echo $data->name ?>;';
+                            localStorage.setItem('event_title', event_title);
+                            var thumbnail = '<?php echo $data->image ?>';
+                            localStorage.setItem('thumbnail', thumbnail);
                             var selectedSeats = {};
                             var pricing = {!! $json_pricing !!};
                             var seatsIoIds = [];
@@ -241,24 +244,35 @@
                                 showZoomOutButtonOnMobile: false,
                                 onObjectSelected: function (object) {
                                     // add the selected seat id to the array
+                                    console.log('Selected Object:', object);
                                     seatsIoIds.push(object.label);
+                                    // Get the ticket category key and price of the selected seat
                                     var ticketKey = object.category.key;
+                                    var seatPrice = parseFloat(object.category.pricing['price']);
                                     // Increment count and add selected seat label
-                                    if (!selectedSeats.hasOwnProperty(ticketKey)) {
-                                    selectedSeats[ticketKey] = { count: 0, seats: [] };
-                                }
-                                    selectedSeats[ticketKey].count++;
-                                    selectedSeats[ticketKey].seats.push(object.label);
-                                    showPaymentbutton();
+                                    if (seatPrice && !isNaN(seatPrice)) {
+                                        if (!selectedSeats.hasOwnProperty(ticketKey)) {
+                                            selectedSeats[ticketKey] = { count: 0, totalPrice: 0, seats: [] };
+                                        }
+                                        selectedSeats[ticketKey].count++;
+                                        selectedSeats[ticketKey].totalPrice += seatPrice;
+                                        selectedSeats[ticketKey].seats.push(object.label);
+                                        showPaymentbutton();
+                                    } else {
+                                        console.error('Invalid seat price:', object.category.price);
+                                    }
                                 },
                                 onObjectDeselected: function (object) {
                                     // remove the deselected seat id from the array
                                     var index = seatsIoIds.indexOf(object.label);
                                     if (index !== -1) seatsIoIds.splice(index, 1);
 
+                                    // Get the ticket category key and price of the deselected seat
                                     var ticketKey = object.category.key;
+                                    var seatPrice = parseFloat(object.category.pricing['price']);
                                     if (selectedSeats.hasOwnProperty(ticketKey) && selectedSeats[ticketKey].count > 0) {
                                         selectedSeats[ticketKey].count--;
+                                        selectedSeats[ticketKey].totalPrice -= seatPrice;
                                         selectedSeats[ticketKey].seats.splice(selectedSeats[ticketKey].seats.indexOf(object.label), 1);
                                         if (selectedSeats[ticketKey].count === 0) {
                                             delete selectedSeats[ticketKey];
@@ -273,10 +287,32 @@
                                 } else {
                                     $("#pay-seatio").hide();
                                 }
+                                var totalPrice = 0;
+                                var totalSeats = 0;
+                                for (var key in selectedSeats) {
+                                    totalPrice += selectedSeats[key].totalPrice;
+                                    totalSeats += selectedSeats[key].count;
+                                }
+                                $("#selectedSeatsTotalPrice").val(totalPrice);
+                                $("#selectedSeatsTotalNumber").val(totalSeats);
                                 $("#selectedSeatsInput").val(JSON.stringify(selectedSeats));
                                 $("#seatsIoIds").val(JSON.stringify(seatsIoIds));
                                 console.log('Selected Seats:', selectedSeats);
+                                var data = {
+                                    totalPrice: totalPrice,
+                                    totalSeats: totalSeats
+                                };
+
+                                // Convert the data object to a JSON string
+                                var jsonData = JSON.stringify(data);
+
+                                // Save the JSON string to localStorage under a key, for example, 'seatsData'
+                                localStorage.setItem('seatsData', jsonData);
+                                localStorage.setItem('seatsIoIds', JSON.stringify(seatsIoIds));
+                                localStorage.setItem('selectedSeatsInput', JSON.stringify(selectedSeats));
+                                localStorage.setItem('seatsio_eventId', $("#seatsio_eventId").val());
                             }
+
                         </script>
                     @else
                         @if (count($data->paid_ticket) != 0)
@@ -402,11 +438,13 @@
                         @endif
                     @endif
                 </div>
-                <form id="seatSelectionForm" action="{{ route('checkout') }}" method="GET">
+                <form id="seatSelectionForm" action="{{ route('checkout_process') }}" method="POST">
                     @csrf
                     <input type="hidden" id="seatsio_eventId" name="seatsio_eventId" value="{{$data->seatsio_eventId}}">
                     <input type="hidden" id="selectedSeatsInput" name="selectedSeats">
                     <input type="hidden" id="seatsIoIds" name="seatsIoIds">
+                    <input type="hidden" id="selectedSeatsTotalPrice" name="selectedSeatsTotalPrice">
+                    <input type="hidden" id="selectedSeatsTotalNumber" name="selectedSeatsTotalNumber">
                     <button type="submit" id="pay-seatio" class="font-medium text-lg leading-6 text-white bg-primary w-full rounded-md py-3 mt-10" style="width:50%; display:none;">Proceed</button>
                 </form>
             </div>

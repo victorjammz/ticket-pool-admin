@@ -987,8 +987,6 @@ class FrontendController extends Controller
         }
         // return view('frontend.checkoutseatio', compact('data'));
 
-        $currentDateTime = date('D, jS M \a\t g:ia');
-        $data->currentDateTime = $currentDateTime;
         $request->session()->put('data', $data);
 
         if (Auth::guard('appuser')->check()) {

@@ -115,7 +115,7 @@ class CheckoutController extends Controller
         $validatedData  = $request->validate([
             'country'       => 'required|string|max:255',
             'city'          => 'required|string|max:255',
-            'contactNumber' => ['required', 'regex:/^\+(?:[0-9] ?){6,14}[0-9]$/'],
+            'contactNumber' => ['required', 'regex:/^(?:[0-9] ?){6,14}[0-9]$/'],
             'howtoknow'     => 'required|string|max:255',
         ]);
 
@@ -131,7 +131,7 @@ class CheckoutController extends Controller
         // register process
         $userDetails = $request->session()->get('user_details', []);
         return redirect()->route('user.customRegister', [
-            'name'      => $userDetails['firstname'],
+            'name'            => $userDetails['firstname'],
             'last_name'       => $userDetails['lastname'],
             'email'           => $request->session()->get('email'),
             'password'        => $userDetails['password'],
@@ -141,19 +141,9 @@ class CheckoutController extends Controller
             'Gender'          => $userDetails['gender'],
             'DateOfBirth'     => $userDetails['birthday'],
             'city'            => $userDetails['city'],
-            'user_type'         => 'user',
+            'user_type'       => 'user',
             'checkout_process' => 1,
         ]);
-
-
-        // $jsonResponse = json_decode($response->content(), true);
-        // // Use the response data
-        // if ($response->getStatusCode() === 200) {
-        //     return redirect()->route('payment_detail_view');
-        // } else {
-        //     $errorMessage = $jsonResponse['error']['message'];
-        //     return redirect()->back()->withErrors($errorMessage)->withInput();
-        // }
     }
 
     public function checkout_process(Request $request)

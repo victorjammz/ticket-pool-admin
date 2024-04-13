@@ -197,7 +197,7 @@ Route::get('testing-email',[EmailTemplateController::class,'testEmail']);
 
 // Checkout process
 // Route::get('/checkout-process', [CheckoutController::class, 'index'])->name('checkout');
-Route::post('/checkout-process', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout-process', [CheckoutController::class, 'index'])->name('checkout_process');
 Route::get('/detail-view', [CheckoutController::class, 'detail_view'])->name('detail_view');
 Route::get('/additional-detail-view', [CheckoutController::class, 'additional_detail_view'])->name('additional_detail_view');
 Route::post('/detail-post', [CheckoutController::class, 'detail_post'])->name('detail_post');

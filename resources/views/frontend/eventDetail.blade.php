@@ -316,7 +316,11 @@
                                 // Format the current date and time
                                 const formattedDateTime = formatDateTime(now);
                                 localStorage.setItem('orderDate', formattedDateTime);
+                                localStorage.setItem('seatsIoIds', JSON.stringify(seatsIoIds));
+                                localStorage.setItem('selectedSeatsInput', JSON.stringify(selectedSeats));
+                                localStorage.setItem('seatsio_eventId', $("#seatsio_eventId").val());
                             }
+
                             function formatDateTime(date) {
                                 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
                                 const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -478,7 +482,7 @@
                         @endif
                     @endif
                 </div>
-                <form id="seatSelectionForm" action="{{ route('checkout') }}" method="POST">
+                <form id="seatSelectionForm" action="{{ route('checkout_process') }}" method="POST">
                     @csrf
                     <input type="hidden" id="seatsio_eventId" name="seatsio_eventId" value="{{$data->seatsio_eventId}}">
                     <input type="hidden" id="selectedSeatsInput" name="selectedSeats">

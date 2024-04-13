@@ -35,6 +35,7 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
         Route::post('/otp-verify', [FrontendController::class, 'otpVerify']);
         Route::get('login', [FrontendController::class, 'login'])->name('user.login');
         Route::post('/login', [FrontendController::class, 'userLogin']);
+        Route::get('/customLogin', [FrontendController::class, 'userLogin'])->name("user.customLogin");
         Route::get('/resetPassword', [FrontendController::class, 'resetPassword']);
         Route::post('/resetPassword', [FrontendController::class, 'userResetPassword']);
         Route::get('/org-register', [FrontendController::class, 'orgRegister']);

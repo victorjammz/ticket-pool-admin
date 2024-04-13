@@ -16,23 +16,18 @@ class CheckoutController extends Controller
     public function index(Request $request)
     {
         // Verify if user is already authenticated
-        $user = Auth::user();
-
-        $currentDateTime = date('D, jS M \a\t g:ia');
-        $request->session()->put('currentDataTime', $currentDateTime);
-        $request->session()->put('order_details', $request->all());
-
+        $data = $request->session()->get('data');
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         } else {
-            return view('frontend.checkout.expressCheckout');
+            return view('frontend.checkout.expressCheckout', compact('data'));
         }
     }
 
     public function detail_view(Request $request)
     {
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
         // Validate the form data
         $validatedData = $request->validate([
@@ -51,28 +46,30 @@ class CheckoutController extends Controller
             // Email already exists, redirect to signin page
             return redirect()->route('login');
         } else {
+            $data = $request->session()->get('data');
             $request->session()->put('email', $email);
             // Email is new, move to detail page
-            return view('frontend.checkout.detail');
+            return view('frontend.checkout.detail', compact('data'));
         }
     }
 
     public function additional_detail_view(Request $request)
     {
+        $data = $request->session()->get('data');
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
-
         $phone = Country::get();
 
-        return view('frontend.checkout.additionalDetail', compact('phone'));
+        return view('frontend.checkout.additionalDetail', compact('phone', 'data'));
     }
 
 
     public function payment_detail_view(Request $request)
     {
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail');
+            $data = $request->session()->get('data');
+            return view('frontend.checkout.paymentDetail', compact('data'));
         }
         return redirect()->route('login');
     }

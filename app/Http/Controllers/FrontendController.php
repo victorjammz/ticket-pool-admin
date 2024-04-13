@@ -985,8 +985,17 @@ class FrontendController extends Controller
             $data['totalAmountTax'] = (Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price')) * $totalTickets;
             $data = (object) $data;
         }
-        // dd($data);
-        return view('frontend.checkoutseatio', compact('data'));
+        // return view('frontend.checkoutseatio', compact('data'));
+
+        $currentDateTime = date('D, jS M \a\t g:ia');
+        $data->currentDateTime = $currentDateTime;
+        $request->session()->put('data', $data);
+
+        if (Auth::guard('appuser')->check()) {
+            return view('frontend.checkout.paymentDetail', compact('data'));
+        } else {
+            return view('frontend.checkout.expressCheckout', compact('data'));
+        }
     }
     public function applyCoupon(Request $request)
     {

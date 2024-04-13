@@ -308,55 +308,11 @@
 
                                 // Save the JSON string to localStorage under a key, for example, 'seatsData'
                                 localStorage.setItem('seatsData', jsonData);
-
-
-                                // Get the current date and time
-                                const now = new Date();
-
-                                // Format the current date and time
-                                const formattedDateTime = formatDateTime(now);
-                                localStorage.setItem('orderDate', formattedDateTime);
                                 localStorage.setItem('seatsIoIds', JSON.stringify(seatsIoIds));
                                 localStorage.setItem('selectedSeatsInput', JSON.stringify(selectedSeats));
                                 localStorage.setItem('seatsio_eventId', $("#seatsio_eventId").val());
                             }
 
-                            function formatDateTime(date) {
-                                const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                                const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-                                // Get day of the week, month, day of the month, hour, and minutes
-                                const dayOfWeek = daysOfWeek[date.getDay()];
-                                const month = monthsOfYear[date.getMonth()];
-                                const dayOfMonth = date.getDate();
-                                const hour = date.getHours() % 12 || 12; // Convert 0 to 12 for 12-hour format
-                                const minutes = ('0' + date.getMinutes()).slice(-2); // Add leading zero if needed
-
-                                // Determine AM/PM
-                                const ampm = date.getHours() >= 12 ? 'pm' : 'am';
-
-                                // Add suffix for day of the month (e.g., 1st, 2nd, 3rd, 4th, etc.)
-                                let daySuffix;
-                                switch (dayOfMonth % 10) {
-                                    case 1:
-                                        daySuffix = 'st';
-                                        break;
-                                    case 2:
-                                        daySuffix = 'nd';
-                                        break;
-                                    case 3:
-                                        daySuffix = 'rd';
-                                        break;
-                                    default:
-                                        daySuffix = 'th';
-                                        break;
-                                }
-
-                                // Construct the formatted date string
-                                const formattedDateTime = `${dayOfWeek}, ${dayOfMonth}${daySuffix} ${month} at ${hour}:${minutes}${ampm}`;
-
-                                return formattedDateTime;
-                            }
                         </script>
                     @else
                         @if (count($data->paid_ticket) != 0)

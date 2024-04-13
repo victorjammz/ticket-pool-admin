@@ -21,7 +21,7 @@
             </form>
 
             <p class="mt-5 text-left text-sm text-gray-500">
-                <a href="#" class="font-semibold leading-6 text-pink">Already have an account? Sign In</a>
+                <a href="{{url('user/login')}}" class="font-semibold leading-6 text-pink">Already have an account? Sign In</a>
             </p>
         </div>
     </div>

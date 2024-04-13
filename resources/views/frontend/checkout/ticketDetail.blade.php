@@ -1,10 +1,14 @@
+<script>
+    var thumbnail = localStorage.getItem('thumbnail');
+    var imageUrl = '{{ url("images/upload/") }}/' + thumbnail;
+</script>
 <div class="flex flex-row justify-between">
     <div class="flex flex-col" style="width:70%">
-        <h4 class="relative font-bold">La Noche - Mature, Stylish, Sexy &#x1F31E;</h4>
+        <h4 class="relative font-bold"><span id="eventTitle"></span> &#x1F31E;</h4>
         <p id="order_date">Sat, 6th Apr at 4:00pm</p>
     </div>
     <div style="width:30%">
-        <img src="images/video_placeholder.png" alt="avatar" width="70px" />
+        <img id="thumbnailImage" alt="avatar" style="width:100%"/>
     </div>
 </div>
 <div class="w-full h-0.5 bg-black mt-5"></div>
@@ -20,7 +24,9 @@
 // Retrieve data from localStorage
 var jsonData = localStorage.getItem('seatsData');
 var orderDate = localStorage.getItem('orderDate');
-
+var event_title = localStorage.getItem('event_title');
+var thumbnail = localStorage.getItem('thumbnail');
+var imageUrl = '{{ url("images/upload/") }}/' + thumbnail;
 // Parse the JSON string back into an object
 var data = JSON.parse(jsonData);
 
@@ -33,5 +39,7 @@ document.getElementById('totalPriceDisplay').textContent = 'Total: £' + totalPr
 document.getElementById('total_price').textContent = '£' + totalPrice;
 document.getElementById('totalNumber').textContent = totalSeats;
 document.getElementById('order_date').textContent = orderDate;
+document.getElementById('eventTitle').textContent = event_title;
+document.getElementById('thumbnailImage').src = imageUrl;
 
 </script>

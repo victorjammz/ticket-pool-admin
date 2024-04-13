@@ -158,6 +158,6 @@ class CheckoutController extends Controller
 
     public function checkout_process(Request $request)
     {
-        return redirect()->route('frontend.checkout');
+        // return view('frontend.checkout');
     }
 }

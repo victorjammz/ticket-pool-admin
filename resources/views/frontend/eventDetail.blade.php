@@ -223,7 +223,10 @@
                         <div id="chart" style="width:1000px; height:450px;"></div>
                         <script src="https://cdn-eu.seatsio.net/chart.js"></script>
                         <script>
-
+                            var event_title = '<?php echo $data->name ?>;';
+                            localStorage.setItem('event_title', event_title);
+                            var thumbnail = '<?php echo $data->image ?>';
+                            localStorage.setItem('thumbnail', thumbnail);
                             var selectedSeats = {};
                             var pricing = {!! $json_pricing !!};
                             var seatsIoIds = [];

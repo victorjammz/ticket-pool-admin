@@ -50,7 +50,7 @@
                     <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password<span style="color:red">*</span></label>
                     <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 px-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="Enter your email address" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one digit, one lowercase and one uppercase letter, and be at least 8 characters long">
                 </div>
-                <div class="flex items-center mb-4" style="margin-top: 20px">
+                <div class="flex items-center mb-4 mt-2" style="margin-top: 20px">
                     <input id="policy" name="tos[]" type="checkbox" value="privacy_policy" class="w-5 h-5 appearance-none border cursor-pointer border-gray-300  rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100" required>
                     <label for="policy" class="text-sm font-norma cursor-pointer text-gray-600">I agree to the Privacy Policy and Terms & Conditions.<span style="color:red">*</span></label>
                 </div>

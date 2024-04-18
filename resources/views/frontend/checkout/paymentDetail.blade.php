@@ -7,7 +7,6 @@
         <div class="w-full">
             <h2 class="text-left text-2xl font-bold leading-9 tracking-tight text-gray-900">Payment Details</h2>
         </div>
-
         <div class="mt-5 w-full">
             <form class="space-y-6" action="{{route('checkout_process')}}" method="POST">
                 @csrf
@@ -50,6 +49,7 @@
             <input type="hidden" name="currency_code" id="currency_code" value="{{ $data->currency_code }}">
             <input type="hidden" name="currency" id="currency" value="{{ $data->currency }}">
             <input type="hidden" name="payment_token" id="payment_token">
+                @if(!isset($singleEvent))
             @php
                 $ticketIdsArray = array_column($data->ticket,'id');
                 $ticketIds =  implode(",",$ticketIdsArray);
@@ -68,7 +68,7 @@
             {{-- <input type="hidden" name="ticketname" id="ticketname" value="{{ $data->name }}"> --}}
             <input type="hidden" name="ticketname" id="ticketname" value="">
             <input type="hidden" id="quantity" name="quantity" value="{{$data->totalTickets}}">
-
+            @endif
             <div class="flex md:space-x-5 md:flex-row md:space-y-0 sm:flex-col sm:space-x-0 sm:space-y-5 xxsm:flex-col xxsm:space-x-0 xxsm:space-y-5 mb-5 payments">
                     <?php $setting = App\Models\PaymentSetting::find(1); ?>
                     {{-- @if ($data->type == 'free')

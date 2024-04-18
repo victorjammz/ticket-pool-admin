@@ -160,6 +160,40 @@ class FrontendController extends Controller
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         return view('frontend.auth.login');
     }
+    public function loginExpress()
+    {
+
+        $setting = Setting::first(['app_name', 'logo']);
+        SEOMeta::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'))
+            ->setDescription('This is login page')
+            ->setCanonical(url()->current())
+            ->addKeyword(['login page', $setting->app_name, $setting->app_name . ' Login', 'sign-in page', $setting->app_name . ' sign-in']);
+
+        OpenGraph::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'))
+            ->setDescription('This is login page')
+            ->setUrl(url()->current());
+
+        JsonLdMulti::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'));
+        JsonLdMulti::setDescription('This is login page');
+        JsonLdMulti::addImage($setting->imagePath . $setting->logo);
+
+        SEOTools::setTitle($setting->app_name . ' - Login' ?? env('APP_NAME'));
+        SEOTools::setDescription('This is login page');
+        SEOTools::opengraph()->addProperty(
+            'keywords',
+            [
+                'login page', $setting->app_name, $setting->app_name . ' Login',
+                'sign-in page', $setting->app_name . ' sign-in'
+            ]
+        );
+        SEOTools::opengraph()->addProperty('image', $setting->imagePath . $setting->logo);
+        SEOTools::opengraph()->setUrl(url()->current());
+        SEOTools::setCanonical(url()->current());
+        SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
+        $data = session()->get('data');
+        $singleEvent = 1;
+        return view('frontend.auth.login_express',compact('data','singleEvent'));
+    }
     public function userLogin(Request $request)
     {
         $request->validate([
@@ -188,6 +222,72 @@ class FrontendController extends Controller
                 }
                 if (!$setting->user_verify) {
                     return redirect('/');
+                } else {
+                    if (!$user->is_verify) {
+                        $details = [
+                            'id' => $user->id,
+                        ];
+                        Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
+                        return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
+                    }
+                }
+                $this->setLanguage($user);
+            } else {
+                return Redirect::back()->with('error_msg', 'Invalid Username or Password.');
+            }
+        }
+        if ($request->type == 'org') {
+            if (Auth::attempt($userdata, $remember)) {
+                if (Auth::user()->hasRole('Organizer')) {
+                    if (Auth::user()->status == 1) {
+                        $this->setLanguage(Auth::user());
+                        return redirect('organization/home');
+                    } else {
+                        return "hello";
+                        return Redirect::back();
+                    }
+                } else {
+                    Auth::logout();
+                    return Redirect::back()->with('error_msg', 'Only authorized person can login.');
+                }
+            } else {
+                return Redirect::back()->with('error_msg', 'Invalid Username or Password.');
+            }
+        }
+    }
+
+    public function userLoginExpress(Request $request)
+    {
+        $request->validate([
+            'email' => 'bail|required|email',
+            'password' => 'bail|required',
+        ]);
+        $userdata = array(
+            'email' => $request->email,
+            'password' => $request->pwd ? $request->pwd : $request->password,
+        );
+        $remember = $request->get('remember');
+        if($request->checkout_process == 1) {
+            $remember = false;
+        }
+
+        if ($request->type == 'user') {
+            $res = Auth::guard('appuser')->attempt($userdata, $remember);
+            $user =  Auth::guard('appuser')->user();
+            if ($res) {
+                $user =  Auth::guard('appuser')->user();
+                $setting = Setting::first(['app_name', 'logo']);
+                if ($request->pwd) {
+                    return redirect()->route('payment_detail_view');
+                }
+                if ($user->status == 0) {
+                    return redirect('user/login')->with('error_msg', 'Blocked By Admin.');
+                }
+                if (!$setting->user_verify) {
+                    $data = $request->session()->get('data');
+                    $singleEvent = 1;
+                    return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
+
                 } else {
                     if (!$user->is_verify) {
                         $details = [
@@ -304,7 +404,14 @@ class FrontendController extends Controller
             ]);
         } else {
             $user = AppUser::create($data);
+            $userdata = array(
+                'email' => $request->email,
+                'password' => $request->password,
+            );
+            Auth::guard('appuser')->attempt($userdata);
+            Auth::guard('appuser')->user();
         }
+
         if ($user->is_verify == 0) {
 
             if (Setting::first()->verify_by == 'email' && Setting::first()->mail_host != NULL) {
@@ -320,7 +427,14 @@ class FrontendController extends Controller
                     ];
                 }
                 Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
+
+                $data = $request->session()->get('data');
+                $singleEvent = 1;
+                if (Auth::guard('appuser')->check()) {
+                    return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
+                }
                 return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
+//                return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
             }
             if (Setting::first()->verify_by == 'phone') {
 
@@ -371,6 +485,7 @@ class FrontendController extends Controller
             }
         }
         return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
+//        return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
     }
     public function LoginByMail($id, $password)
     {
@@ -830,12 +945,11 @@ class FrontendController extends Controller
 
     public function checkout(Request $request, $id)
     {
+        $singleEvent = 1;
 
         $data = Ticket::find($id);
         $data->event = Event::find($data->event_id);
-
         $setting = Setting::first();
-
         SEOMeta::setTitle($data->name)
             ->setDescription($data->description)
             ->addKeyword([
@@ -895,20 +1009,35 @@ class FrontendController extends Controller
             $data->rows = $rows;
             $data->seatsByRow = $seatsByRow;
         }
+        $timezone = Setting::find(1)->timezone;
+        $date = Carbon::now($timezone);
+        $data->paid_ticket = Ticket::where([['event_id', $data->event->id], ['is_deleted', 0], ['type', 'paid'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
+        $filteredTicket = $data->paid_ticket->where('id', $id)->first();
+        $data->price_total = $filteredTicket->price;
         $data->totalPersTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'percentage']])->sum('price');
         $data->totalAmountTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price');
-        return view('frontend.checkout', compact('data'));
+        $request->session()->put('data', $data);
+        if (Auth::guard('appuser')->check()) {
+            return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
+        }
+        return view('frontend.checkout.expressCheckout', compact('data','singleEvent'));
     }
 
     public function checkoutseatsio(Request $request)
     {
         $selectedSeats = json_decode($request->selectedSeats, true);
+        if($selectedSeats)
+        {
+            $seatKeys = array_keys($selectedSeats);
+            $eventDetails = Event::with(['ticket' => function ($query) use ($seatKeys) {
+                // Apply the where condition on the ticket relationship
+                $query->whereIn('ticket_key', $seatKeys);
+            }])->where('seatsio_eventId', $request->seatsio_eventId)->first();
+        }
+        else{
+           $eventDetails = $request->session()->get('data');
+        }
         // $seatsIoIds = json_decode($request->seatsIoIds,true);
-        $seatKeys = array_keys($selectedSeats);
-        $eventDetails = Event::with(['ticket' => function ($query) use ($seatKeys) {
-            // Apply the where condition on the ticket relationship
-            $query->whereIn('ticket_key', $seatKeys);
-        }])->where('seatsio_eventId', $request->seatsio_eventId)->first();
 
         $data = array();
         $data['event'] = $eventDetails;
@@ -985,12 +1114,16 @@ class FrontendController extends Controller
             $data['totalAmountTax'] = (Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price')) * $totalTickets;
             $data = (object) $data;
         }
+        else{
+            $data = $eventDetails;
+            $singleEvent = 1;
+        }
         // return view('frontend.checkoutseatio', compact('data'));
-
         $request->session()->put('data', $data);
 
+
         if (Auth::guard('appuser')->check()) {
-            return view('frontend.checkout.paymentDetail', compact('data'));
+            return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
         } else {
             return view('frontend.checkout.expressCheckout', compact('data'));
         }

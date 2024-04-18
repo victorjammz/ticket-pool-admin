@@ -46,10 +46,12 @@ class CheckoutController extends Controller
             // Email already exists, redirect to signin page
             return redirect()->route('login');
         } else {
+            $singleEvent = 1;
+
             $data = $request->session()->get('data');
             $request->session()->put('email', $email);
             // Email is new, move to detail page
-            return view('frontend.checkout.detail', compact('data'));
+            return view('frontend.checkout.detail', compact('data','singleEvent'));
         }
     }
 
@@ -60,8 +62,8 @@ class CheckoutController extends Controller
             return view('frontend.checkout.paymentDetail', compact('data'));
         }
         $phone = Country::get();
-
-        return view('frontend.checkout.additionalDetail', compact('phone', 'data'));
+        $singleEvent = 1;
+        return view('frontend.checkout.additionalDetail', compact('phone', 'data','singleEvent'));
     }
 
 

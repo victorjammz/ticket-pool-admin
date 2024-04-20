@@ -26,7 +26,9 @@ class CheckoutController extends Controller
 
     public function detail_view(Request $request)
     {
+
         if (Auth::guard('appuser')->check()) {
+            $data = $request->session()->get('data');
             return view('frontend.checkout.paymentDetail', compact('data'));
         }
         // Validate the form data
@@ -39,12 +41,10 @@ class CheckoutController extends Controller
         }
 
         $email = $request->input('email');
-
         $user = AppUser::where('email', $email)->first();
 
         if ($user) {
-            // Email already exists, redirect to signin page
-            return redirect()->route('login');
+            return redirect()->route('login.express');
         } else {
             $singleEvent = 1;
 

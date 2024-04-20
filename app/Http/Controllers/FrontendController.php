@@ -15,6 +15,7 @@ use App\Models\AppUser;
 use App\Models\Category;
 use App\Models\Blog;
 use App\Models\Faq;
+use Illuminate\Http\RedirectResponse;
 use Twilio\Rest\Client;
 use App\Models\Order;
 use App\Models\Setting;
@@ -322,13 +323,14 @@ class FrontendController extends Controller
         }
     }
 
-    public function userLogout(Request $request)
+    public function userLogout(Request $request): RedirectResponse
     {
         if (Auth::guard('appuser')->check()) {
             Auth::guard('appuser')->logout();
-            return redirect('/user/login');
         }
+        return redirect('/');
     }
+
     public function register()
     {
         $setting = Setting::first(['app_name', 'logo']);
@@ -1118,7 +1120,7 @@ class FrontendController extends Controller
             $data = $eventDetails;
             $singleEvent = 1;
         }
-        // return view('frontend.checkoutseatio', compact('data'));
+//         return view('frontend.checkoutseatio', compact('data'));
         $request->session()->put('data', $data);
 
 
@@ -2133,6 +2135,7 @@ class FrontendController extends Controller
     }
     public function checkoutSession(Request $request)
     {
+//        dd($request->all());
         $request->session()->put('request', $request->all());
         $key = PaymentSetting::first()->stripeSecretKey;
         Stripe::setApiKey($key);

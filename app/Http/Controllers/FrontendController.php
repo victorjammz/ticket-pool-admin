@@ -421,6 +421,11 @@ class FrontendController extends Controller
                         'url' => url('user/VerificationConfirm/' .  $user->id)
                     ];
                 }
+                $data = $request->session()->get('data');
+                $singleEvent = 1;
+                if (Auth::guard('appuser')->check()) {
+                    return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
+                }
                 Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
                 return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
             }
@@ -471,6 +476,9 @@ class FrontendController extends Controller
                     return redirect('user/otp-verify/' . $user->id)->with(['success' => "Phone verification code sent via SMS."]);
                 }
             }
+        }
+        if (Auth::guard('appuser')->check()) {
+            return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
         }
         return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
     }

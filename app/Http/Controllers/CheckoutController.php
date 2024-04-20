@@ -129,6 +129,7 @@ class CheckoutController extends Controller
 
         // register process
         $userDetails = $request->session()->get('user_details', []);
+//        dd($userDetails);
         return redirect()->route('user.customRegister', [
             'name'            => $userDetails['firstname'],
             'last_name'       => $userDetails['lastname'],

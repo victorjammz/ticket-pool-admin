@@ -50,11 +50,11 @@ $(document).ready(function () {
 
     // Fetch cities based on selected country code using Geonames API
     $.getJSON(
-      "http://api.geonames.org/searchJSON",
+      "https://secure.geonames.org/searchJSON",
       {
         country: selectedCountryCode,
         featureClass: "P",
-        maxRows: 10,
+        // maxRows: 10,
         username: "oskarmast", // Replace 'demo' with your Geonames API username
       },
       function (data) {

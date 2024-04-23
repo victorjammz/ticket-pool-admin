@@ -1261,7 +1261,7 @@ class FrontendController extends Controller
         $setting = Setting::find(1);
 
         // for user notification
-        $message = NotificationTemplate::where('title', 'Order Notification')->first()->message_content;
+        $message = NotificationTemplate::where('title', 'Book Ticket')->first()->message_content;
         $detail['user_name'] = $user->name . ' ' . $user->last_name;
         $detail['quantity'] = $request->quantity;
         $detail['event_name'] = Event::find($order->event_id)->name;
@@ -1283,7 +1283,7 @@ class FrontendController extends Controller
         }
 
         // for user mail
-        $ticket_book = NotificationTemplate::where('title', 'Order Notification')->first();
+        $ticket_book = NotificationTemplate::where('title', 'Book Ticket')->first();
         $details['user_name'] = $user->name . ' ' . $user->last_name;
         $details['quantity'] = $request->quantity;
         $details['event_name'] = Event::find($order->event_id)->name;
@@ -2318,7 +2318,7 @@ class FrontendController extends Controller
             }
         }
         // for user mail
-        $ticket_book = NotificationTemplate::where('title', 'Order Notification')->first();
+        $ticket_book = NotificationTemplate::where('title', 'Book Ticket')->first();
         $details['user_name'] = $user->name . ' ' . $user->last_name;
         $details['quantity'] = $request['quantity'];
         $details['event_name'] = Event::find($order->event_id)->name;

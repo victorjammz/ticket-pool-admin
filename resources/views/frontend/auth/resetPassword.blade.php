@@ -62,7 +62,7 @@
         input[type="radio"]:checked {
             background-color: var(--primary_color) !important;
             color: var(--primary_color) !important;
-        }        
+        }
         .text-underline {
             text-decoration: underline;
         }
@@ -83,7 +83,7 @@
         input[type="radio"] {
             margin: 0 5px 0 10px;
         }
-        
+
         @media (max-width: 576px) {
             .mobile-hide {
                 display: none !important;
@@ -159,8 +159,8 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                        </div>                        
-                        
+                        </div>
+
                         <div class="form-group text-right">
                             <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right">
                                 {{ __('Reset Password') }}

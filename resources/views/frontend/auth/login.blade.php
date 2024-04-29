@@ -4,7 +4,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>{{ __('Login') }}</title>    
+    <title>{{ __('Login') }}</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         crossorigin="anonymous">
     <link href="/applications/ticket-pool/public/admin/css/style.css" rel="stylesheet">
@@ -82,7 +82,7 @@
         input[type="radio"] {
             margin: 0 5px 0 10px;
         }
-        
+
         @media (max-width: 576px) {
             .mobile-hide {
                 display: none !important;
@@ -178,15 +178,15 @@
                             </div>
                         </div>
 
-                        <div class="form-group d-flex align-items-end justify-content-between"> 
+                        <div class="form-group d-flex align-items-end justify-content-between">
                             <a href="{{ url('/user/resetPassword') }}"
                                         class="text-xs font-medium leading-5 font-poppins text-white text-underline">{{ __('Forgot your password?') }}</a>
                             <div class="text-right">
                                 <button class="btn btn-primary btn-lg btn-icon icon-right">
                                     {{ __('Sign In') }}
-                                </button>                               
+                                </button>
                             </div>
-                        </div>                        
+                        </div>
                     </form>
                     <div class="mt-5 form-group d-flex align-items-end justify-content-between">
                         <h5 class="font-medium text-left font-poppins text-white pb-0 mb-0">

@@ -27,13 +27,17 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
 
     Route::group(['prefix' => 'user'], function () {
 
-        Route::get('/VerificationConfirm/{id}', [FrontendController::class, 'LoginByMail']);
+        Route::get('/VerificationConfirm/{id}/{checkout}', [FrontendController::class, 'LoginByMail']);
         Route::get('/register', [FrontendController::class, 'register']);
         Route::post('/register', [FrontendController::class, 'userRegister']);
+        Route::get('/customRegister', [FrontendController::class, 'userRegister'])->name("user.customRegister");
         Route::get('/otp-verify/{userid}', [FrontendController::class, 'otpView']);
         Route::post('/otp-verify', [FrontendController::class, 'otpVerify']);
         Route::get('login', [FrontendController::class, 'login'])->name('user.login');
         Route::post('/login', [FrontendController::class, 'userLogin']);
+        Route::get('/login-express', [FrontendController::class, 'loginExpress'])->name('login.express');
+        Route::post('/login-express', [FrontendController::class, 'userLoginExpress'])->name('user.login.express');
+        Route::get('/customLogin', [FrontendController::class, 'userLogin'])->name("user.customLogin");
         Route::get('/resetPassword', [FrontendController::class, 'resetPassword']);
         Route::post('/resetPassword', [FrontendController::class, 'userResetPassword']);
         Route::get('/org-register', [FrontendController::class, 'orgRegister']);
@@ -53,7 +57,7 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
         Route::get('/all-events', [FrontendController::class, 'allEvents']);
         Route::post('/all-events', [FrontendController::class, 'allEvents']);
         Route::get('/events-category/{id}/{name}', [FrontendController::class, 'categoryEvents']);
-        Route::get('/event-type/{type}', [FrontendController::class, 'eventType']);        
+        Route::get('/event-type/{type}', [FrontendController::class, 'eventType']);
         Route::get('/event-old/{id}/{name}', [FrontendController::class, 'eventDetailOld']);
         Route::get('/event/{id}/{name}', [FrontendController::class, 'eventDetail']);
         Route::get('/events/{id}', [FrontendController::class, 'eventDetail']);
@@ -63,11 +67,11 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
         // Route::get('/all-blogs', [FrontendController::class, 'blogs']);
         // Route::get('/blog-detail/{id}/{name}', [FrontendController::class, 'blogDetail']);
         Route::get('/contact', [FrontendController::class, 'contact']);
+        Route::get('/checkout/{id}', [FrontendController::class, 'checkout']);
 
         Route::group(['middleware' => 'appuser'], function () {
 
             Route::get('email/verify/{id}/{token}', [FrontendController::class, 'emailVerify']);
-            Route::get('/checkout/{id}', [FrontendController::class, 'checkout']);
             Route::post('/checkout', [FrontendController::class, 'checkoutseatsio'])->name('checkout');
             Route::post('/applyCoupon', [FrontendController::class, 'applyCoupon']);
             Route::any('/createOrder', [FrontendController::class, 'createOrder'])->name('createOrderUser');
@@ -101,4 +105,3 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
         });
     });
 });
-

@@ -57,7 +57,7 @@ class ApiController extends Controller
         if (Auth::guard('appuser')->attempt($credentials)) {
             // Successfully authenticated
             $user = Auth::guard('appuser')->user();
-            
+
             // Assuming you want to do something with device token right after login
             if ($request->has('device_token')) {
                 $user->device_token = $request->device_token;
@@ -112,7 +112,6 @@ class ApiController extends Controller
                     'password'   => $setting->mail_password
                 );
                 Config::set('mail', $config);
-
                 $details = [
                     'url' => url('user/VerificationConfirm/' .  $user->id)
                 ];

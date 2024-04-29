@@ -12,7 +12,7 @@
                 <img src="{{ asset('images/downarrow.png') }}" alt="" class="w-3 h-3 z-20">
             </a>
         </div>
-       
+
         <input type="hidden" name="totalAmountTax" id="totalAmountTax" value="{{ $data->totalAmountTax }}">
         <input type="hidden" name="totalPersTax" id="totalPersTax" value="{{ $data->totalPersTax }}">
         <input type="hidden" name="flutterwave_key" value="{{ \App\Models\PaymentSetting::find(1)->ravePublicKey }}">
@@ -49,18 +49,18 @@
             <input type="hidden" name="stripe_payment" id="stripe_payment"
                 value="{{ $price }}">
 
-                
+
             <input type="hidden" name="currency_code" id="currency_code" value="{{ $data->currency_code }}">
             <input type="hidden" name="currency" id="currency" value="{{ $data->currency }}">
             <input type="hidden" name="payment_token" id="payment_token">
-            @php 
+            @php
                 $ticketIdsArray = array_column($data->ticket,'id');
-                $ticketIds =  implode(",",$ticketIdsArray);                
+                $ticketIds =  implode(",",$ticketIdsArray);
             @endphp
             <input type="hidden" name="ticket_id" id="ticket_id" value="{{ $ticketIds }}">
             <input type="hidden" name="selectedSeats" id="selectedSeats">
             <input type="hidden" name="selectedSeatsId[]" id="selectedSeatsId">
-            
+
             <input type="hidden" name="coupon_id" id="coupon_id" value="">
             <input type="hidden" name="coupon_discount" id="coupon_discount" value="0">
             <input type="hidden" name="subtotal" id="subtotal" value="">
@@ -70,7 +70,7 @@
             <input type="hidden" name="event_id" value="{{ $data->event->event_id }}">
             {{-- <input type="hidden" name="ticketname" id="ticketname" value="{{ $data->name }}"> --}}
             <input type="hidden" name="ticketname" id="ticketname" value="">
-            
+
             <div
                 class="mt-10 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
                 <div
@@ -128,7 +128,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                           
+
                                         {{-- @if ($data->allday == 0)
                                             <div>
                                                 <input type="date" name="ticket_date" id="onetime"
@@ -174,7 +174,7 @@
                                                     class="border border-gray-light  p-5 rounded-lg text-gray-100 w-full font-normal text-base leading-6 flex">
                                                     {{ __('FREE') }}
                                                     <input id="default-radio-1" required type="radio" value="FREE"
-                                                        name="payment_type" 
+                                                        name="payment_type"
                                                         class="ml-2 h-5 w-5 mr-2 border border-gray-light  hover:border-gray-light focus:outline-none">
                                                 </div>
                                             @else --}}
@@ -343,7 +343,7 @@
                                         </div>
                                     </div>
                                 {{-- @endif --}}
-                                
+
                             </div>
                         </div>
                     </div>

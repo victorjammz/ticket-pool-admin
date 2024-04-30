@@ -1020,6 +1020,8 @@ class FrontendController extends Controller
 
     public function checkoutseatsio(Request $request)
     {
+        $singleEvent = 1;
+
         $selectedSeats = json_decode($request->selectedSeats, true);
         if($selectedSeats)
         {
@@ -1113,7 +1115,6 @@ class FrontendController extends Controller
         }
         else{
             $data = $eventDetails;
-            $singleEvent = 1;
         }
 //         return view('frontend.checkoutseatio', compact('data'));
         $request->session()->put('data', $data);
@@ -2203,7 +2204,6 @@ class FrontendController extends Controller
         }
 
         $event = Event::find($ticket->event_id);
-
         $org = User::find($event->user_id);
         $user = AppUser::find(Auth::guard('appuser')->user()->id);
         $data['order_id'] = '#' . rand(9999, 100000);
@@ -2275,14 +2275,24 @@ class FrontendController extends Controller
                 $key = 0;
             }
         }else{
-            for ($i = 1; $i <= $request['quantity']; $i++) {
-                $child['ticket_number'] = uniqid();
-                $child['ticket_id'] = $request['ticket_id'];
-                $child['order_id'] = $order->id;
-                $child['customer_id'] = Auth::guard('appuser')->user()->id;
-                OrderChild::create($child);
+            if($request['quantity'])
+            {
+                for ($i = 1; $i <= $request['quantity']; $i++) {
+                    $child['ticket_number'] = uniqid();
+                    $child['ticket_id'] = $request['ticket_id'];
+                    $child['order_id'] = $order->id;
+                    $child['customer_id'] = Auth::guard('appuser')->user()->id;
+                    OrderChild::create($child);
+                }
             }
-        }
+            elseif($request['ticket_id'] > 0) {
+                    $child['ticket_number'] = uniqid();
+                    $child['ticket_id'] = $request['ticket_id'];
+                    $child['order_id'] = $order->id;
+                    $child['customer_id'] = Auth::guard('appuser')->user()->id;
+                    OrderChild::create($child);
+                }
+            }
         
         if (isset($request['tax_data'])) {
             foreach (json_decode($data['tax_data']) as $value) {

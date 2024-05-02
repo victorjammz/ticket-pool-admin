@@ -155,6 +155,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/update_appuser', [UserController::class, 'updateAppUser']);
     Route::get('/organization/income', [UserController::class, 'orgincome']);
     Route::get('/organizer-setting', [SettingController::class, 'payment_setting']);
+    Route::post('/bank-details', [SettingController::class, 'bankDetails'])->name('bank.details');
     Route::post('/payment-save', [SettingController::class, 'organizer_payment_save']);
     Route::get('/wallet-transactions', [WalletController::class, 'allTransactions'])->name('allTransactions');
     Route::resources([

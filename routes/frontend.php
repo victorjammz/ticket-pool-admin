@@ -71,6 +71,9 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
 
         Route::group(['middleware' => 'appuser'], function () {
 
+            Route::get('follow-event/{event}',[FrontendController::class,'followEvent'])->name('follow.event');
+            Route::get('unfollow-event/{event}',[FrontendController::class,'unFollowEvent'])->name('unfollow.event');
+
             Route::get('email/verify/{id}/{token}', [FrontendController::class, 'emailVerify']);
             Route::post('/checkout', [FrontendController::class, 'checkoutseatsio'])->name('checkout');
             Route::post('/applyCoupon', [FrontendController::class, 'applyCoupon']);

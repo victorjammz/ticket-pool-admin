@@ -16,6 +16,7 @@ use App\Models\Category;
 use App\Models\Blog;
 use App\Models\Faq;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
 use App\Models\Order;
 use App\Models\Setting;
@@ -2397,4 +2398,39 @@ class FrontendController extends Controller
     {
         return redirect()->back();
     }
+
+
+    public function followEvent($event): RedirectResponse
+    {
+        $eventData = Event::find($event);
+        $eventData->followers = $eventData->followers+=1;
+        $eventData->save();
+
+        $appUserId = Auth::guard('appuser')->user()->id;
+        DB::table('follow_event')->insert([
+            'appuser_id' => $appUserId,
+            'event_id' => $event,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return \redirect()->back();
+    }
+
+    public function unfollowEvent($event): RedirectResponse
+    {
+        $eventData = Event::find($event);
+        $eventData->followers -= 1;
+        $eventData->save();
+
+        $appUserId = Auth::guard('appuser')->user()->id;
+
+        DB::table('follow_event')
+            ->where('appuser_id', $appUserId)
+            ->where('event_id', $event)
+            ->delete();
+
+        return redirect()->back();
+    }
+
 }

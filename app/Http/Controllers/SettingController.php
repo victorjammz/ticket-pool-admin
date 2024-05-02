@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankDetail;
 use App\Models\Currency;
 use App\Models\Setting;
 use App\Models\Timezone;
@@ -323,8 +324,30 @@ class SettingController extends Controller
             $mode = false;
         }
         $payment = OrganizerPaymentKeys::where('organizer_id', Auth::user()->id)->first();
-        return view('admin.organizer.organizerSetting', compact('mode', 'payment'));
+        $data = BankDetail::where('organizer_id',auth()->user()->id)->first();
+        return view('admin.organizer.organizerSetting', compact('mode', 'payment','data'));
     }
+    public function bankDetails(Request $request)
+    {
+        $validatedData = $request->validate([
+            'account_holder_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:255',
+            'bank_name' => 'required|string|max:255',
+            'iban' => 'required|string|max:255',
+        ]);
+        $organizerId = auth()->user()->id;
+
+        $bankDetail = BankDetail::where('organizer_id', $organizerId)->first();
+        if ($bankDetail) {
+            $bankDetail->update($validatedData);
+        } else {
+            $validatedData['organizer_id'] = $organizerId;
+            BankDetail::create($validatedData);
+        }
+        return redirect()->back()->withStatus(__('Bank Details save successfully.'));
+    }
+
+
 
     public function organizer_payment_save(Request $request)
     {

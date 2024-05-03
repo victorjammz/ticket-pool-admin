@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Email;
@@ -49,5 +50,13 @@ class Misc
             Log::error('An unexpected error occurred while sending email: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public static function hasUserFollowedEvent($userId, $eventId): bool
+    {
+        return DB::table('follow_event')
+            ->where('appuser_id', $userId)
+            ->where('event_id', $eventId)
+            ->exists();
     }
 }

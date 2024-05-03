@@ -16,6 +16,7 @@ use App\Models\Category;
 use App\Models\Blog;
 use App\Models\Faq;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
 use App\Models\Order;
 use App\Models\Setting;
@@ -89,6 +90,7 @@ class FrontendController extends Controller
         if (env('DB_DATABASE') == null) {
             return view('admin.frontpage');
         } else {
+            $topBanner = Setting::find(1);
             $setting = Setting::first(['app_name', 'logo']);
 
             SEOMeta::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'))
@@ -126,7 +128,7 @@ class FrontendController extends Controller
             }
             $banner = Banner::with('event')->where('status', 1)->get();
             $user = Auth::guard('appuser')->user();
-            return view('frontend.home', compact('events', 'organizer', 'category', 'blog', 'banner', 'user'));
+            return view('frontend.home', compact('events', 'organizer', 'category', 'blog', 'banner', 'user','topBanner'));
         }
     }
     public function login()
@@ -1147,7 +1149,7 @@ class FrontendController extends Controller
                         $subtotal = $total - $discount;
 
                         return response([
-                            'success' => true, 'payableamount' => $discount, 'total_price' => $subtotal, 'total' => $total, 'discount' => $coupon->discount, 'coupon_id' => $coupon->id, 'coupon_type' => $coupon->discount_type
+                            'success' => true, 'payableamount' => $discount, 'total_price' => $subtotal, 'total' => $total, 'discount' => $coupon->discount, 'coupon_id' => $coupon->id, 'coupon_type' => $coupon->discount_type, 'coupon_code' => $coupon->coupon_code
                         ]);
                     } else {
                         return response([
@@ -2397,4 +2399,39 @@ class FrontendController extends Controller
     {
         return redirect()->back();
     }
+
+
+    public function followEvent($event): RedirectResponse
+    {
+        $eventData = Event::find($event);
+        $eventData->followers = $eventData->followers+=1;
+        $eventData->save();
+
+        $appUserId = Auth::guard('appuser')->user()->id;
+        DB::table('follow_event')->insert([
+            'appuser_id' => $appUserId,
+            'event_id' => $event,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return \redirect()->back();
+    }
+
+    public function unfollowEvent($event): RedirectResponse
+    {
+        $eventData = Event::find($event);
+        $eventData->followers -= 1;
+        $eventData->save();
+
+        $appUserId = Auth::guard('appuser')->user()->id;
+
+        DB::table('follow_event')
+            ->where('appuser_id', $appUserId)
+            ->where('event_id', $event)
+            ->delete();
+
+        return redirect()->back();
+    }
+
 }

@@ -2189,6 +2189,45 @@
                     </div>
 
                 </div>
+
+                <div class="col-lg-6">
+                    <div class="card card-large-icons">
+                        <div class="card-icon bg-primary text-white">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="card-body">
+                            <h4>{{ __('Banner Image') }}</h4>
+                            <p>{{ __('Upload a banner image for your website.') }}</p>
+                            <a href="#banner-image-setting" aria-controls="banner-image-setting" role="button"
+                               data-toggle="collapse" class="card-cta" aria-expanded="false">{{ __('Change Banner Image') }}
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            <div class="collapse mt-3" id="banner-image-setting">
+                                <form method="post" action="{{ route('save.banner.image') }}" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="form-group row mb-4">
+                                        <label class="col-form-label col-12">{{ __('Banner Image') }}</label>
+                                        <div class="col-12">
+                                            <div id="banner-image-preview" class="image-preview banner-image-preview" style="height: 125px !important;width: 250px !important;">
+                                                <label for="banner-image-upload" id="banner-image-label"> <i class="fas fa-plus" style="margin-top: 17px; !important;"></i></label>
+                                                <input type="file" name="banner_image" id="banner-image-upload" onchange="previewBannerImage(this)" />
+                                                <img id="banner-image-preview-img" src="{{ $setting->banner_image ? url('images/upload/' . $setting->banner_image) : '' }}" alt="Preview" style="display: {{ $setting->banner_image ? 'block' : 'none' }}; max-width: 100%; height: auto;">
+                                            </div>
+                                            @error('banner_image')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group row mb-4">
+                                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-primary demo-button">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                        </div>
+                    </div>
+                </div>
                 </form>
             </div>
         </div>
@@ -2251,5 +2290,35 @@
             $('#latitude').val(place.geometry['location'].lat());
             $('#longitude').val(place.geometry['location'].lng());
         });
+    }
+</script>
+<script>
+    // JavaScript function to preview banner image
+    function previewBannerImage(input) {
+        var preview = document.getElementById('banner-image-preview-img');
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+            preview.style.display = 'block';
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+            preview.style.display = null;
+        }
+    }
+
+    // Display the currently saved banner image on page load
+    window.onload = function() {
+        var bannerImage = "{{ $setting->banner_image ? url('images/upload/' . $setting->banner_image) : '' }}";
+        var previewImg = document.getElementById('banner-image-preview-img');
+        if (bannerImage) {
+            previewImg.src = bannerImage;
+            previewImg.style.display = 'block';
+        }
     }
 </script>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankDetail;
 use App\Models\Currency;
 use App\Models\Setting;
 use App\Models\Timezone;
@@ -77,8 +78,8 @@ class SettingController extends Controller
             'mail_username' => 'bail|required_if:mail_notification,1',
             'mail_password' => 'bail|required_if:mail_notification,1',
             'sender_email' => 'bail|required_if:mail_notification,1',
-            'mail_encryption'=> 'bail|required_if:mail_notification,1',
-            'mail_mailer'=> 'bail|required_if:mail_notification,1',
+            'mail_encryption' => 'bail|required_if:mail_notification,1',
+            'mail_mailer' => 'bail|required_if:mail_notification,1',
         ]);
         $this->updateEnvFile([
             'MAIL_MAILER' => $request->input('mail_mailer'),
@@ -98,10 +99,11 @@ class SettingController extends Controller
         try {
             Setting::find(1)->update($data);
         } catch (\Throwable $th) {
-           return redirect('admin-setting')->withStatus(__($th->getMessage())); 
+            return redirect('admin-setting')->withStatus(__($th->getMessage()));
         }
         return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
     }
+
     private function updateEnvFile(array $data)
     {
         $envFilePath = base_path('.env');
@@ -260,11 +262,13 @@ class SettingController extends Controller
         PaymentSetting::find(1)->update($data);
         return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
     }
+
     public function socialmedialinks(Request $request)
     {
         Setting::find(1)->update($request->all());
         return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
     }
+
     public function maintain()
     {
         if (App::isDownForMaintenance()) {
@@ -273,6 +277,7 @@ class SettingController extends Controller
         }
         return redirect('/');
     }
+
     public function maintenanceMode(Request $request)
     {
         $setting = Setting::first();
@@ -297,6 +302,7 @@ class SettingController extends Controller
         $setting->save();
         return redirect()->back()->with('message');
     }
+
     public function appuserPrivacyPolicy(Request $request)
     {
         Setting::find(1)->update($request->all());
@@ -323,8 +329,30 @@ class SettingController extends Controller
             $mode = false;
         }
         $payment = OrganizerPaymentKeys::where('organizer_id', Auth::user()->id)->first();
-        return view('admin.organizer.organizerSetting', compact('mode', 'payment'));
+        $data = BankDetail::where('organizer_id', auth()->user()->id)->first();
+        return view('admin.organizer.organizerSetting', compact('mode', 'payment', 'data'));
     }
+
+    public function bankDetails(Request $request)
+    {
+        $validatedData = $request->validate([
+            'account_holder_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:255',
+            'bank_name' => 'required|string|max:255',
+            'iban' => 'required|string|max:255',
+        ]);
+        $organizerId = auth()->user()->id;
+
+        $bankDetail = BankDetail::where('organizer_id', $organizerId)->first();
+        if ($bankDetail) {
+            $bankDetail->update($validatedData);
+        } else {
+            $validatedData['organizer_id'] = $organizerId;
+            BankDetail::create($validatedData);
+        }
+        return redirect()->back()->withStatus(__('Bank Details save successfully.'));
+    }
+
 
     public function organizer_payment_save(Request $request)
     {
@@ -357,5 +385,25 @@ class SettingController extends Controller
 
         OrganizerPaymentKeys::where('organizer_id', Auth::user()->id)->update($data);
         return redirect()->back()->withStatus(__('Setting saved successfully.'));
+    }
+
+
+    public function saveBannerImage(Request $request)
+    {
+        $setting = Setting::find(1);
+        if ($request->hasFile('banner_image')) {
+            if ($setting->banner_image != null) {
+                Storage::delete('/images/upload' . $setting->banner_image);
+            }
+            $bannerImage = $request->file('banner_image');
+            $name = uniqid() . '.' . $bannerImage->getClientOriginalExtension();
+            $destinationPath = public_path('/images/upload');
+            $bannerImage->move($destinationPath, $name);
+            $data['banner_image'] = $name;
+            Setting::find(1)->update($data);
+
+            return redirect()->back()->withStatus(__('Banner Image Save Successfully!'));
+
+        }
     }
 }

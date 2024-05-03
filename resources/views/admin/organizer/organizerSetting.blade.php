@@ -43,185 +43,65 @@
                             <i class="fas fa-hand-holding-usd"></i>
                         </div>
                         <div class="card-body">
-                            <h4>{{ __('Payment Setting') }}</h4>
-                            <p>{{ __('Payment settings include different payment gateway and which will display top the admin for the Settlement Payout. Local Payment (cash ) option will be shown to the admin by default. Only selected gateways will be visible.') }}
+                            <h4>{{ __('Bank Details') }}</h4>
+                            <p>{{ __('Bank details, including the account holder\'s name, account number, bank name, and IBAN, are crucial for accurate fund transfers. Secure handling and adherence to data protection regulations are paramount to safeguard sensitive financial information.') }}
                             </p>
                             <a href="#payment-setting" aria-controls="payment-setting" role="button"
                                 data-toggle="collapse" class="card-cta"
                                 aria-expanded="false">{{ __('Change Setting') }}
                                 <i class="fas fa-chevron-right"></i></a>
                             <div class="collapse mt-3" id="payment-setting">
-                                <form method="post" action="{{ url('payment-save') }}">
+                                <form method="post" action="{{ route('bank.details') }}">
                                     @csrf
+
                                     <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3">{{ __('Stripe') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <div class="custom-switches-stacked mt-2">
-                                                <label class="custom-switch pl-0">
-                                                    <input type="checkbox" name="stripe"
-                                                        {{ $payment->stripe == '1' ? 'checked' : '' }} value="1"
-                                                        class="custom-switch-input">
-                                                    <span class="custom-switch-indicator"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3">{{ __('Paypal') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <div class="custom-switches-stacked mt-2">
-                                                <label class="custom-switch pl-0">
-                                                    <input type="checkbox" name="paypal"
-                                                        {{ $payment->paypal == '1' ? 'checked' : '' }} value="1"
-                                                        class="custom-switch-input">
-                                                    <span class="custom-switch-indicator"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3">{{ __('Flutterwave') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <div class="custom-switches-stacked mt-2">
-                                                <label class="custom-switch pl-0">
-                                                    <input type="checkbox" name="flutterwave"
-                                                        {{ $payment->flutterwave == '1' ? 'checked' : '' }}
-                                                        value="1" class="custom-switch-input">
-                                                    <span class="custom-switch-indicator"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3">{{ __('Razorpay') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <div class="custom-switches-stacked mt-2">
-                                                <label class="custom-switch pl-0">
-                                                    <input type="checkbox" name="razor"
-                                                        {{ $payment->razor == '1' ? 'checked' : '' }} value="1"
-                                                        class="custom-switch-input">
-                                                    <span class="custom-switch-indicator"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Stripe secret key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="stripeSecretKey"
-                                                placeholder="{{ __('Stripe secret key') }}" value="{{$payment->stripeSecretKey}}"
-                                                class="form-control @error('stripeSecretKey')? is-invalid @enderror">
-                                            @error('stripeSecretKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                        <label class="col-form-label col-12">{{ __('Account Holder\'s Name') }}</label>
+                                        <div class="col-12">
+                                            <input type="text" name="account_holder_name" placeholder="{{ __('Account Holder\'s Name') }}" value="{{ old('account_holder_name', $data->account_holder_name ?? '') }}"
+                                                   class="form-control @error('account_holder_name') is-invalid @enderror">
+                                            @error('account_holder_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
+
                                     <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Stripe public key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="stripePublicKey"
-                                                placeholder="{{ __('Stripe public key') }}" value="{{$payment->stripePublicKey}}"
-                                                class="form-control @error('stripePublicKey')? is-invalid @enderror">
-                                            @error('stripePublicKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <a href="https://stripe.com/docs/keys#obtain-api-keys" target="_blank"
-                                                class="btn btn-primary demo-button mt-2">{{ __('Help') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Paypal Client ID') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="paypalClientId"
-                                                placeholder="{{ __('Paypal Client ID') }}" value="{{$payment->paypalClientId}}"
-                                                class="form-control @error('paypalClientId')? is-invalid @enderror">
-                                            @error('paypalClientId')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                        <label class="col-form-label col-12">{{ __('Account Number') }}</label>
+                                        <div class="col-12">
+                                            <input type="text" name="account_number" placeholder="{{ __('Account Number') }}" value="{{ old('account_number', $data->account_number ?? '') }}"
+                                                   class="form-control @error('account_number') is-invalid @enderror">
+                                            @error('account_number')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
+
                                     <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Paypal Secret key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="paypalSecret"
-                                                placeholder="{{ __('Paypal Secret key') }}" value="{{$payment->paypalSecret}}"
-                                                class="form-control @error('paypalSecret')? is-invalid @enderror">
-                                            @error('paypalSecret')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <a href="https://www.appinvoice.com/en/s/documentation/how-to-get-paypal-client-id-and-secret-key-22"
-                                                target="_blank"
-                                                class="btn btn-primary demo-button mt-2">{{ __('Help') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Razorpay Publish key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="razorPublishKey"
-                                                placeholder="{{ __('Razorpay Publish key') }}" value="{{$payment->razorPublishKey}}"
-                                                class="form-control @error('razorPublishKey')? is-invalid @enderror">
-                                            @error('razorPublishKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                        <label class="col-form-label col-12">{{ __('Bank Name') }}</label>
+                                        <div class="col-12">
+                                            <input type="text" name="bank_name" placeholder="{{ __('Bank Name') }}" value="{{ old('bank_name', $data->bank_name ?? '') }}"
+                                                   class="form-control @error('bank_name') is-invalid @enderror">
+                                            @error('bank_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
+
                                     <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Razorpay Secret key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="razorSecretKey"
-                                                placeholder="{{ __('Razorpay Secret key') }}" value="{{$payment->razorSecretKey}}"
-                                                class="form-control @error('razorSecretKey')? is-invalid @enderror">
-                                            @error('razorSecretKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <a href="https://razorpay.com/docs/payments/dashboard/settings/api-keys/"
-                                                target="_blank"
-                                                class="btn btn-primary demo-button mt-2">{{ __('Help') }}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Flutterwave public key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="ravePublicKey"
-                                                placeholder="{{ __('Flutterwave public key') }}" value="{{$payment->ravePublicKey}}"
-                                                class="form-control @error('ravePublicKey')? is-invalid @enderror">
-                                            @error('ravePublicKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                        <label class="col-form-label col-12">{{ __('IBAN') }}</label>
+                                        <div class="col-12">
+                                            <input type="text" name="iban" placeholder="{{ __('IBAN') }}" value="{{ old('iban', $data->iban ?? '') }}"
+                                                   class="form-control @error('iban') is-invalid @enderror">
+                                            @error('iban')
+                                            <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="form-group row mb-4">
-                                        <label
-                                            class="col-form-label text-md-right col-12 col-md-3 col-lg-3">{{ __('Flutterwave secret key') }}</label>
-                                        <div class="col-sm-12 col-md-9">
-                                            <input type="text" name="raveSecretKey"
-                                                placeholder="{{ __('Flutterwave secret key') }}" value="{{$payment->raveSecretKey}}"
-                                                class="form-control @error('raveSecretKey')? is-invalid @enderror">
-                                            @error('raveSecretKey')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                                <a href="https://developer.flutterwave.com/docs/quickstart" target="_blank"
-                                                    class="btn btn-primary demo-button mt-2">{{ __('Help') }}
-                                                </a>
-                                        </div>
-                                    </div>
+
+
                                     <div class="form-group row mb-4">
                                         <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
-                                        <div class="col-sm-12 col-md-7">
+                                        <div class="col-12">
                                             <button type="submit"
                                                 class="btn btn-primary demo-button">{{ __('Save') }}</button>
                                         </div>
@@ -231,7 +111,6 @@
                         </div>
                     </div>
                 </div>
-                </form>
             </div>
         </div>
     </section>

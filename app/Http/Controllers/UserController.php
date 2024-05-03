@@ -427,7 +427,39 @@ class UserController extends Controller
             $value->avaliable = $tickets - $sold_ticket;
             array_push($master['eventDate'], $value->start_time->format('Y-m-d'));
         }
-        return view('admin.org_dashboard', compact('events', 'monthEvent', 'master'));
+        $genderCounts = DB::table('app_user')
+            ->select('Gender', DB::raw('COUNT(*) as count'))
+            ->whereIn('Gender', ['male', 'female'])
+            ->groupBy('Gender')
+            ->get();
+
+        $ageDistribution = DB::table('app_user')
+            ->select(DB::raw('CASE 
+                        WHEN TIMESTAMPDIFF(YEAR, DateOfBirth, CURDATE()) BETWEEN 16 AND 20 THEN "16-20"
+                        WHEN TIMESTAMPDIFF(YEAR, DateOfBirth, CURDATE()) BETWEEN 21 AND 24 THEN "21-24"
+                        WHEN TIMESTAMPDIFF(YEAR, DateOfBirth, CURDATE()) BETWEEN 25 AND 30 THEN "25-30"
+                        WHEN TIMESTAMPDIFF(YEAR, DateOfBirth, CURDATE()) BETWEEN 31 AND 40 THEN "31-40"
+                        ELSE "40+"
+                    END AS AgeRange'),
+                DB::raw('COUNT(*) as count'))
+            ->whereNotNull('DateOfBirth')
+            ->groupBy('AgeRange')
+            ->orderByRaw('CASE 
+                        WHEN AgeRange = "16-20" THEN 1
+                        WHEN AgeRange = "21-24" THEN 2
+                        WHEN AgeRange = "25-30" THEN 3
+                        WHEN AgeRange = "31-40" THEN 4
+                        ELSE 5
+                    END')
+            ->get();
+        $countryDistribution = DB::table('app_user')
+            ->select('Country', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('Country')
+            ->groupBy('Country')
+            ->orderBy('count', 'desc')
+            ->get();
+
+        return view('admin.org_dashboard', compact('events', 'monthEvent', 'master','genderCounts','ageDistribution','countryDistribution'));
     }
 
     public function viewProfile()

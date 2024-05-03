@@ -4,8 +4,15 @@
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://code.highcharts.com/highcharts-3d.js"></script>
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+
     <script>
         $(document).ready(function() {
+            var femaleCount = {{ $genderCounts[0]->count }};
+            var maleCount = {{ $genderCounts[1]->count }};
+            var ageDistribution = @json($ageDistribution);
+            var countryData = @json($countryDistribution);
+
             colors = ['#591387', '#a75fc1', '#9a3dea', '#9e7ddf', '#9f91ff'];
             Highcharts.chart('chart-container1', {
                 chart: {
@@ -36,8 +43,8 @@
                 series: [{
                     name: 'Gender Distribution',
                     data: [
-                        ['Male', 2],
-                        ['FeMale', 8]
+                        ['Female', femaleCount],
+                        ['Male', maleCount]
 
                     ]
                 }]
@@ -70,12 +77,7 @@
                 },
                 series: [{
                     name: 'Age Distribution',
-                    data: [
-                        ['10-19', 16],
-                        ['20-29', 12],
-                        ['30-39', 8],
-
-                    ]
+                    data: ageDistribution.map(item => [item.AgeRange, item.count])
                 }]
             });
             Highcharts.chart('chart-container3', {
@@ -106,12 +108,7 @@
                 },
                 series: [{
                     name: 'Gelocation Distribution',
-                    data: [
-                        ['Norway', 16],
-                        ['Germany', 12],
-                        ['USA', 8],
-
-                    ]
+                    data: countryData.map(item => [item.Country, item.count])
                 }]
             });
         })
@@ -121,7 +118,7 @@
             height: 300px;
         }
     </style>
-    
+
     <section class="section">
         <div class="section-header">
             <h1>{{ __('Dashboard') }} </h1>
@@ -204,7 +201,7 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-4 col-md-4 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="card">
                         <div class="card-stats" style="z-index:1">
                             <div class="card-stats-title text-left pb-0">{{ __('Customer Gender') }}</div>
@@ -212,7 +209,7 @@
                         <div id="chart-container1" class="chart-container"></div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-12">
                     <div class="card">
                         <div class="card-stats" style="z-index:1">
                             <div class="card-stats-title text-left pb-0">{{ __('Age Distribution') }}</div>
@@ -220,7 +217,7 @@
                         <div id="chart-container2" class="chart-container"></div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-sm-12">
+                <div class="col-12">
                     <div class="card">
                         <div class="card-stats" style="z-index:1">
                             <div class="card-stats-title text-left pb-0">{{ __('Traffic Geolocations') }}</div>

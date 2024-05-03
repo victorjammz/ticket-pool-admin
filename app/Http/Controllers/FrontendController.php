@@ -90,6 +90,7 @@ class FrontendController extends Controller
         if (env('DB_DATABASE') == null) {
             return view('admin.frontpage');
         } else {
+            $topBanner = Setting::find(1);
             $setting = Setting::first(['app_name', 'logo']);
 
             SEOMeta::setTitle($setting->app_name . ' - Home' ?? env('APP_NAME'))
@@ -127,7 +128,7 @@ class FrontendController extends Controller
             }
             $banner = Banner::with('event')->where('status', 1)->get();
             $user = Auth::guard('appuser')->user();
-            return view('frontend.home', compact('events', 'organizer', 'category', 'blog', 'banner', 'user'));
+            return view('frontend.home', compact('events', 'organizer', 'category', 'blog', 'banner', 'user','topBanner'));
         }
     }
     public function login()
@@ -1148,7 +1149,7 @@ class FrontendController extends Controller
                         $subtotal = $total - $discount;
 
                         return response([
-                            'success' => true, 'payableamount' => $discount, 'total_price' => $subtotal, 'total' => $total, 'discount' => $coupon->discount, 'coupon_id' => $coupon->id, 'coupon_type' => $coupon->discount_type
+                            'success' => true, 'payableamount' => $discount, 'total_price' => $subtotal, 'total' => $total, 'discount' => $coupon->discount, 'coupon_id' => $coupon->id, 'coupon_type' => $coupon->discount_type, 'coupon_code' => $coupon->coupon_code
                         ]);
                     } else {
                         return response([

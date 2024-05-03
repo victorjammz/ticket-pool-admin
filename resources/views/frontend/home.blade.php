@@ -47,7 +47,12 @@
 {{--                    @endforeach--}}
 {{--                </div>--}}
 {{--            </div>--}}
-        <img src="{{ url('images/topbanner.png') }}" alt="">
+        @if(isset($topBanner->banner_image))
+            <img src="{{ url('images/upload/' . $topBanner->banner_image) }}" alt="">
+        @else
+            <img src="{{ url('images/topbanner.png') }}" alt="">
+        @endif
+
 
 
         <div id="default-carousel" class="relative" data-carousel="slide">

@@ -49,7 +49,8 @@
         <button type="submit"  id="applyCuppon" name="apply"
                 class="flex w-25 justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black">{{ __('Apply') }}</button>
     </div>
-        @endif
+        <div class="couponerror text-danger ml-2"></div> <!-- Error message container -->
+    @endif
 </div>
 {{-- @if (isset($data->type) && $data->type == 'paid') --}}
 
@@ -133,8 +134,8 @@
                             $("#subtotal").val(parseFloat(result.total_price).toFixed(2));
                             $(".discount").text(currency + parseFloat(result.payableamount).toFixed(2));
                             $("#coupon_discount").val(parseFloat(result.discount).toFixed(2));
-                            $("#coupon_id").val(result.coupon_code);
-                            $(".coupon_id").text(result.coupon_code);
+                            $("#coupon_id").val(result.coupon_code); // Set value using .val()
+                            $(".coupon_id").text(result.coupon_code); // Incorrect, should be removed
                             $("#coupon_id").prop("disabled", true);
                             $("#applyCuppon").prop("disabled", true);
                             $(".coupon_code").prop("readonly", true);
@@ -142,14 +143,15 @@
                             if (result.coupon_type === 0) {
                                 $("#discount_type").text("%" + result.discount);
                             }
-                        } else {
+                        }
+                        else {
                             // Display error message if coupon application fails
                             $(".couponerror").html('<div class="text-danger ml-2">' + result.message + "</div>");
                         }
                     },
                     error: function(xhr, status, error) {
                         // Display error message if there's an AJAX error
-                        $(".couponerror").html('<div class="text-danger ml-2">An error occurred while applying the coupon. Please try again later.</div>');
+                        $(".couponerror").html('<div class="text-danger ml-2">' + result.message + "</div>");
                     }
                 });
             } else {

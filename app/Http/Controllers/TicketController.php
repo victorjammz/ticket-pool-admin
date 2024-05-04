@@ -20,7 +20,7 @@ class TicketController extends Controller
     {
         abort_if(Gate::denies('ticket_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $event = Event::find($id);
-        $ticket = Ticket::where([['event_id', $id], ['is_deleted', 0]])->orderBy('id', 'DESC')->get();
+        $ticket = Ticket::with('soldTickets')->where([['event_id', $id], ['is_deleted', 0]])->orderBy('id', 'DESC')->get();
         return view('admin.ticket.index', compact('ticket', 'event'));
     }
 

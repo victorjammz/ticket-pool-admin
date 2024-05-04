@@ -11,6 +11,9 @@ use App\Http\Controllers\AppHelper;
 use App\Models\User;
 use App\Models\AppUser;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -279,4 +282,37 @@ class EventController extends Controller
         $data->update();
         return redirect()->back();
     }
+
+    public function saveEventAmount(Request $request): RedirectResponse
+    {
+        $validatedData = $request->validate([
+            'event_id' => 'required',
+            'send_amount' => 'required|numeric',
+            'currency' => 'required|string',
+            'send_from' => 'required|string',
+            'send_to' => 'required|string',
+        ]);
+        $now = now()->toDateTimeString();
+        $validatedData['created_at'] = $now;
+        $validatedData['updated_at'] = $now;
+
+        $save = DB::table('send_amount_history')->insert($validatedData);
+        if ($save) {
+            return redirect()->back()->with('success', 'Data saved successfully.');
+        } else {
+            return redirect()->back()->with('error', 'Failed to save data.');
+        }
+    }
+    public function getAmountHistory(Request $request): JsonResponse
+    {
+        $eventId = $request->input('event_id');
+
+        $transactions = DB::table('send_amount_history')
+            ->select(DB::raw('DATE(created_at) as date'), 'send_amount', 'currency','send_from','send_to')
+            ->where('event_id', $eventId)
+            ->orderBy('date', 'desc')
+            ->get();
+        return response()->json($transactions);
+    }
+
 }

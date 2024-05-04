@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        'id',
         'name',
         'first_name',
         'last_name',
@@ -77,5 +79,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class);
     }
+
+    public function bankDetails()
+    {
+        return $this->hasOne(BankDetail::class, 'organizer_id');
+    }
+
 
 }

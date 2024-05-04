@@ -53,6 +53,7 @@
                                             <th>{{ __('Role') }}</th>
                                             <th>{{ __('Status') }}</th>
                                             <th>{{__('Verified')}}</th>
+                                            <th>{{__('Bank Details')}}</th>
                                             @if (Gate::check('user_edit') || Gate::check('user_delete'))
                                                 <th>{{ __('Action') }}</th>
                                             @endif
@@ -93,8 +94,18 @@
                                                 </td>
                                                 <td>
                                                     <h5><span
-                                                        class="badge {{ $item->is_verify == '1' ? 'badge-success' : 'badge-danger' }}  m-1">{{ $item->is_verify == '1' ? 'Verified' : 'Unverified' }}</span>
-                                                </h5>
+                                                                class="badge {{ $item->is_verify == '1' ? 'badge-success' : 'badge-danger' }}  m-1">{{ $item->is_verify == '1' ? 'Verified' : 'Unverified' }}</span>
+                                                    </h5>
+                                                </td>
+                                                <td>
+                                                    <h5 class="" style="cursor:pointer;" data-toggle="modal" data-target="#exampleModalCenter">
+                                                        @if(isset($item->bankDetails))
+                                                            <button class="btn btn-primary btn-bank-details" data-toggle="modal" data-target="#exampleModalCenter" data-bank-details="{{ json_encode($item->bankDetails) }}">
+                                                                Bank Details
+                                                            </button>
+
+                                                        @endif
+                                                    </h5>
                                                 </td>
                                                 @if (Gate::check('user_edit') || Gate::check('user_delete'))
                                                     <td>
@@ -135,4 +146,49 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Bank Details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="bank-details-content">
+                        <!-- Bank details will be dynamically populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('.btn-bank-details').click(function() {
+                var bankDetails = $(this).data('bank-details');
+                console.log(bankDetails)
+                populateModalWithBankDetails(bankDetails);
+            });
+
+
+            function populateModalWithBankDetails(bankDetails) {
+                // Clear previous content
+                $('#bank-details-content').empty();
+
+                // Create and append input fields with labels for bank details to modal body
+                $('#bank-details-content').append('<div class="form-group"><label for="account-holder-name">Account Holder Name:</label><input type="text" id="account-holder-name" class="form-control mb-2" value="' + bankDetails.account_holder_name + '" disabled></div>');
+                $('#bank-details-content').append('<div class="form-group"><label for="account-number">Account Number:</label><input type="text" id="account-number" class="form-control mb-2" value="' + bankDetails.account_number + '" disabled></div>');
+                $('#bank-details-content').append('<div class="form-group"><label for="bank-name">Bank Name:</label><input type="text" id="bank-name" class="form-control mb-2" value="' + bankDetails.bank_name + '" disabled></div>');
+                $('#bank-details-content').append('<div class="form-group"><label for="iban">IBAN:</label><input type="text" id="iban" class="form-control mb-2" value="' + bankDetails.iban + '" disabled></div>');
+            }
+        });
+    </script>
+
 @endsection
+

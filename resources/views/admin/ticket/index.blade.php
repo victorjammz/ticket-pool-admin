@@ -47,6 +47,8 @@
                                             <th>{{ __('Price') }}</th>
                                             <th>{{ __('Sales End') }}</th>
                                             <th>{{ __('Status') }}</th>
+                                            <th>{{ __('Remaining') }}</th>
+                                            <th>{{ __('Sold') }}</th>
                                             <th>{{ __('Mode') }}</th>
                                             <th>{{ __('Maximum Check-ins') }}</th>
                                             @if (Gate::check('ticket_edit') || Gate::check('ticket_delete'))
@@ -68,6 +70,15 @@
                                                     <h5>
                                                         <span
                                                             class="badge {{ $item->status == '1' ? 'badge-success' : 'badge-warning' }}  m-1">{{ $item->status == '1' ? 'Active' : 'Inactive' }}</span>
+                                                    </h5>
+                                                </td><td>
+                                                    <h5>
+                                                        <span class="badge badge-primary m-1">{{ $item->quantity - $item->soldTickets->count() }}</span>
+
+                                                    </h5>
+                                                </td><td>
+                                                    <h5>
+                                                        <span class="badge badge-primary m-1">{{ $item->soldTickets->count() }}</span>
                                                     </h5>
                                                 </td>
                                                 <td>

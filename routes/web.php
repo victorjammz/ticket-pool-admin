@@ -158,6 +158,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/bank-details', [SettingController::class, 'bankDetails'])->name('bank.details');
     Route::post('/payment-save', [SettingController::class, 'organizer_payment_save']);
     Route::post('/save-banner-image', [SettingController::class, 'saveBannerImage'])->name('save.banner.image');
+    Route::post('/save-event-amount', [EventController::class, 'saveEventAmount'])->name('save.event.amount');
+    Route::get('/event-amount-history', [EventController::class, 'getAmountHistory'])->name('event.amount.history');
     Route::get('/wallet-transactions', [WalletController::class, 'allTransactions'])->name('allTransactions');
     Route::resources([
 

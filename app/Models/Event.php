@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\DB;
 
 class Event extends Model
 {
@@ -89,4 +92,20 @@ class Event extends Model
         $data =  $query->whereBetween('start_time', [$start,  $end]);
         return $data;
     }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    // Define accessor for sold tickets price
+    public function getSoldTicketsPriceAttribute(): int
+    {
+        return intval(Order::where('event_id', $this->id)->sum('payment'));
+    }
+    public function getSendAmountAttribute(): int
+    {
+        return intval(DB::table('send_amount_history')->where('event_id', $this->id)->sum('send_amount'));
+    }
+
 }

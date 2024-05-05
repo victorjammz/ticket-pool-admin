@@ -4,7 +4,7 @@
 <div class="flex flex-col justify-center container gap -10 m-auto w-[80%] mt-10 mb-10 msm:flex-row msm:mt-20 msm:w-[70%]">
     <div class="flex min-h-full flex-col px-6 py-12 h-112  msm:w-1/2" style="box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);">
         <div class="w-full">
-            <h2 class="text-left text-2xl font-bold leading-9 tracking-tight text-gray-900">Express Checkout</h2>
+            <h2 class="text-left text-2xl font-bold leading-9 tracking-tight text-gray-900">Create Account</h2>
         </div>
 
         <input type="hidden" name="totalAmountTax" id="totalAmountTax" value="{{ $data->totalAmountTax }}">

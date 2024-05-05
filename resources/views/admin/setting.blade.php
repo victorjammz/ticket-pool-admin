@@ -2228,6 +2228,77 @@
                             </div>                        </div>
                     </div>
                 </div>
+
+
+                <div class="col-lg-6">
+
+                    <div class="card card-large-icons">
+
+                        <div class="card-icon bg-primary text-white">
+
+                            <i class="fas fa-solid fa-users"></i>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <h4>{{ __('Appuser Terms and Conditions') }}</h4>
+
+                            <p>{{ __('Describe Terms and Conditions') }}
+
+                            </p>
+
+                            <a href="#AppuserTermsConditions" aria-controls="additional-setting" role="button"
+                               data-toggle="collapse" class="card-cta"
+                               aria-expanded="false">{{ __('Change Setting') }} <i
+                                        class="fas fa-chevron-right"></i></a>
+
+                            <div class="collapse mt-3" id="AppuserTermsConditions">
+
+                                <form method="post" action="{{ url('appuser-terms-and-conditions') }}">
+
+                                    @csrf
+
+                                    <div class="form-group ">
+
+                                        <label>{{ __('Appuser Terms and Conditions') }}</label>
+                                        <textarea name="app_user_terms_conditions" Placeholder="{{ __('Terms and Conditions') }}"
+                                                  class="textarea_editor @error('app_user_terms_conditions')? is-invalid @enderror">
+                                            @if(isset($termsConditions))
+                                            {{ $termsConditions->app_user_terms_conditions }}
+                                            @endif
+                                        </textarea>
+
+                                        @error('appuser_terms_conditions')
+                                        <div class="invalid-feedback block">{{ $message }}</div>
+                                        @enderror
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
+
+                                        <div class="col-sm-12 col-md-7">
+
+                                            <button type="submit"
+                                                    class="btn btn-primary demo-button">{{ __('Save') }}</button>
+
+                                        </div>
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
                 </form>
             </div>
         </div>

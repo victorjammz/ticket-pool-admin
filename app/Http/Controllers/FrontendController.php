@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TermsConditions;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Exception;
 use App\Models\Event;
@@ -15,6 +16,9 @@ use App\Models\AppUser;
 use App\Models\Category;
 use App\Models\Blog;
 use App\Models\Faq;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
@@ -1996,6 +2000,11 @@ class FrontendController extends Controller
     {
         $policy = Setting::find(1)->appuser_privacy_policy;
         return view('frontend.privacy-policy', compact('policy'));
+    }
+    public function appUserTermsAndConditions(Request $request): Factory|View|array|Application
+    {
+        $termsConditions = TermsConditions::find(1)->app_user_terms_conditions;
+        return view('frontend.terms_and_conditions', compact('termsConditions'));
     }
     public function searchEvent(Request $request)
     {

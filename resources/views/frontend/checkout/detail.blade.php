@@ -58,7 +58,10 @@
                 </div>
                 <div class="flex items-center mb-4 mt-2" style="margin-top: 20px">
                     <input id="policy" name="tos[]" type="checkbox" value="privacy_policy" class="w-5 h-5 appearance-none border cursor-pointer border-gray-300  rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100" required>
-                    <label for="policy" class="text-sm font-norma cursor-pointer text-gray-600">I agree to the Privacy Policy and Terms & Conditions.<span style="color:red">*</span></label>
+                    <label for="policy" class="text-sm font-norma cursor-pointer text-gray-600">I agree to the
+                        <a href="{{route('app.user.privacy.policy')}}" style="font-weight: 600; !important;">Privacy Policy</a> and
+                        <a href="{{route('app.user.terms.conditions')}}" style="font-weight: 600; !important;">Terms & Conditions</a>.
+                        <span style="color:red">*</span></label>
                 </div>
                 <div class="flex items-center">
                     <input id="event" name="tos[]" type="checkbox" value="keep_informed" class="w-5 h-5 appearance-none cursor-pointer border border-gray-300  rounded-md mr-2 hover:border-indigo-500 hover:bg-indigo-100 checked:bg-no-repeat checked:bg-center checked:border-indigo-500 checked:bg-indigo-100">

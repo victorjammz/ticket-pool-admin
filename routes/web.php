@@ -103,7 +103,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/support-setting', [SettingController::class, 'supportSetting']);
     Route::post('/save-payment-setting', [SettingController::class, 'savePaymentSetting']);
     Route::post('/socialmedialinks', [SettingController::class, 'socialmedialinks']);
-    Route::post('/appuser-privacy-policy', [SettingController::class, 'appuserPrivacyPolicy']);
+    Route::post('/appuser-privacy-policy', [SettingController::class, 'appuserPrivacyPolicy'])->name('appuser.privacy.policy');
+    Route::post('/appuser-terms-and-conditions', [SettingController::class, 'appUserTermsAndConditions'])->name('app.user.terms.and.conditions');
     Route::get('/profile', [UserController::class, 'viewProfile']);
     Route::post('/edit-profile', [UserController::class, 'editProfile']);
     Route::post('/change-password', [UserController::class, 'changePassword']);

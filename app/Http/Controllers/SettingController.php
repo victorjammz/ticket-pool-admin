@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BankDetail;
 use App\Models\Currency;
 use App\Models\Setting;
+use App\Models\TermsConditions;
 use App\Models\Timezone;
 use App\Http\Controllers\AppHelper;
 use App\Models\ContactUs;
@@ -36,7 +37,8 @@ class SettingController extends Controller
         $payment = PaymentSetting::find(1);
         $languages = Language::whereStatus(1)->get();
         $aboutUs = ContactUs::find(1);
-        return view('admin.setting', compact('mode', 'setting', 'languages', 'currencies', 'payment', 'timezone', 'aboutUs'));
+        $termsConditions = TermsConditions::find(1);
+        return view('admin.setting', compact('mode', 'setting', 'languages', 'currencies', 'payment', 'timezone', 'aboutUs','termsConditions'));
     }
 
 
@@ -306,6 +308,18 @@ class SettingController extends Controller
     public function appuserPrivacyPolicy(Request $request)
     {
         Setting::find(1)->update($request->all());
+        return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
+    }
+    public function appUserTermsAndConditions(Request $request)
+    {
+        $data = TermsConditions::find(1);
+        if($data)
+        {
+            $data->update($request->all());
+        }
+        else{
+            TermsConditions::create($request->all());
+        }
         return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
     }
 

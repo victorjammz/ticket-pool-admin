@@ -1,5 +1,5 @@
 @extends('frontend.master', ['activePage' => null])
-@section('title', __('Privacy-policy'))
+@section('title', __('Terms-and-Conditions'))
 @section('content')
     <div class=" bg-scroll min-h-screen" style="background-image: url('images/events.png')">
         {{-- scroll --}}
@@ -13,10 +13,12 @@
         <div
             class="mt-5 3xl:mx-52 2xl:mx-28 1xl:mx-28 xl:mx-36 xlg:mx-32 lg:mx-36 xxmd:mx-24 xmd:mx-32 md:mx-28 sm:mx-20 msm:mx-16 xsm:mx-10 xxsm:mx-5 z-10 relative">
             <div class="space-y-10 mt-10 mb-5">
-                <p class="font-semibold font-poppins text-5xl leading-10 text-black mt-10">{{__('Privacy Policy')}}</p>
+                <p class="font-semibold font-poppins text-5xl leading-10 text-black mt-10">{{__('Terms and Conditions')}}</p>
             </div>
             <p class="font-normal font-poppins text-xl leading-7 text-black-100">
-                {!! $policy !!}
+                @if(isset($termsConditions))
+                    {!! $termsConditions !!}
+                @endif
             </p>
 
         </div>

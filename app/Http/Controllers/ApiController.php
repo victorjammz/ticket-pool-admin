@@ -111,6 +111,7 @@ class ApiController extends Controller
                     'username'   => $setting->mail_username,
                     'password'   => $setting->mail_password
                 );
+                dd($config);
                 Config::set('mail', $config);
                 $details = [
                     'url' => url('user/VerificationConfirm/' .  $user->id)
@@ -759,7 +760,7 @@ class ApiController extends Controller
         }
         if ($request->payment_type == "STRIPE") {
             $currency_code = Setting::first()->currency;
-            $stripe_payment = $currency_code == "USD" || $currency_code == "EUR" || $currency_code == "INR" ? $request->payment * 100 : $request->payment;
+            $stripe_payment = $currency_code == "USD" || $currency_code == "GBP" || $currency_code == "EUR" || $currency_code == "INR" ? $request->payment * 100 : $request->payment;
 
             $cur = Setting::find(1)->currency;
             $stripe_secret =  PaymentSetting::find(1)->stripeSecretKey;

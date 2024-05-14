@@ -234,11 +234,11 @@
                                         <div class="form-group">
                                             <label>{{ __('Event Id') }}</label>
                                             <input type="text" name="seatsio_eventId" value="{{ old('seatsio_eventId') }}"
-                                                class="form-control @error('seatsio_eventId')? is-invalid @enderror">
+                                                class="form-control @error('seatsio_eventId') is-invalid @enderror">
                                             @error('seatsio_eventId')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                        </div>                                       
+                                        </div>                                   
                                     </div>
                                 </div>
                                 <div class="form-group">

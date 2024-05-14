@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label>{{ __('Name') }}</label>
+                                            <label>{{ __('Name of event') }}</label>
                                             <input type="text" name="name" value="{{ old('name') }}"
                                                 placeholder="{{ __('Name') }}"
                                                 class="form-control @error('name')? is-invalid @enderror">

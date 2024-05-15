@@ -134,6 +134,7 @@ class EventController extends Controller
             'description' => 'bail|required',
             'scanner_id' => 'bail|required_if:type,offline|array',
             'people' => 'bail|required',
+            'seatsio_eventId' => 'nullable|string'
         ]);
         $data = $request->all();
         $data = $request->except('scanner_id');
@@ -150,7 +151,6 @@ class EventController extends Controller
         if (!Auth::user()->hasRole('admin')) {
             $data['user_id'] = Auth::user()->id;
         }
-//        dd($data);
         $event = Event::create($data);
         return redirect()->route('events.index')->withStatus(__('Event has added successfully.'));
     }

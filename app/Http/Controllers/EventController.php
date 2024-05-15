@@ -185,6 +185,7 @@ class EventController extends Controller
 
         $request->validate([
             'name' => 'bail|required',
+            'image' => 'bail|nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'start_time' => 'bail|required',
             'end_time' => 'bail|required',
             'category_id' => 'bail|required',
@@ -193,10 +194,11 @@ class EventController extends Controller
             'lat' => 'bail|required_if:type,offline',
             'lang' => 'bail|required_if:type,offline',
             'status' => 'bail|required',
-            'url'=>'bail|required_if:type,online',
+            'url' => 'bail|required_if:type,online',
             'description' => 'bail|required',
-            'scanner_id' => 'bail|required_if:type,offline|array',
+            'scanner_id' => 'nullable|array',
             'people' => 'bail|required',
+            'seatsio_eventId' => 'nullable|string'
         ]);
         $data = $request->all();
 

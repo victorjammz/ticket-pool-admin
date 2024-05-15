@@ -232,7 +232,7 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div class="form-group">
-                                            <label>{{ __('Seats.io optional id') }}</label>
+                                            <label>{{ __('Seats.io id') }}</label>
                                             <input type="text" name="seatsio_eventId" value="{{ old('seatsio_eventId') }}"
                                                 class="form-control @error('seatsio_eventId') is-invalid @enderror">
                                             @error('seatsio_eventId')

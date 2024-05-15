@@ -132,7 +132,7 @@ class EventController extends Controller
             'status' => 'bail|required',
             'url'=>'bail|required_if:type,online',
             'description' => 'bail|required',
-            'scanner_id' => 'bail|required_if:type,offline|array',
+            'scanner_id' => 'nullable|array',
             'people' => 'bail|required',
             'seatsio_eventId' => 'nullable|string'
         ]);

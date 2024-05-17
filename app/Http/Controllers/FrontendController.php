@@ -1016,8 +1016,18 @@ class FrontendController extends Controller
         $filteredTicket = $data->paid_ticket->where('id', $id)->first();
         if ($filteredTicket) {
             $data->price_total = $filteredTicket->price;
+
+            if ($filteredTicket->price > 0) {
+                $data->totalPassTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'percentage']])->sum('amount');
+                $data->totalSumTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price');
+            } else {
+                $data->totalPassTax = 0;
+                $data->totalSumTax = 0;
+            }
+
         } else {
             $data->price_total = 0;
+            return redirect()->back()->with('error', 'Ticket not found or is free');
         }
         $data->totalPersTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'percentage']])->sum('price');
         $data->totalAmountTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price');

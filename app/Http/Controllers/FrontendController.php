@@ -1014,7 +1014,11 @@ class FrontendController extends Controller
         $date = Carbon::now($timezone);
         $data->paid_ticket = Ticket::where([['event_id', $data->event->id], ['is_deleted', 0], ['type', 'paid'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
         $filteredTicket = $data->paid_ticket->where('id', $id)->first();
-        $data->price_total = $filteredTicket->price;
+        if ($filteredTicket) {
+            $data->price_total = $filteredTicket->price;
+        } else {
+            $data->price_total = 0;
+        }
         $data->totalPersTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'percentage']])->sum('price');
         $data->totalAmountTax = Tax::where([['allow_all_bill', 1], ['status', 1], ['amount_type', 'price']])->sum('price');
         $request->session()->put('data', $data);

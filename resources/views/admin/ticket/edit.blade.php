@@ -175,8 +175,8 @@
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <label>{{ __('Ticket Key') }}</label>
-                                        <input type="number" name="ticket_key" min="1" required
-                                            placeholder="{{ __('Ticket Key') }}" id="ticket_key"
+                                        <input type="number" name="ticket_key"
+                                            placeholder="{{ __('Please insert 0 unless recommended otherwise by Ticketpool Admin') }}" id="ticket_key"
                                             value="{{ $ticket->ticket_key }}"
                                             class="form-control @error('ticket_key')? is-invalid @enderror">
                                         @error('ticket_key')

@@ -62,7 +62,15 @@
             <p class="font-normal text-lg leading-7 text-gray-200">
                 {{ __('Total Tax amount') }}</p>
             <p class="font-medium text-lg leading-7 text-gray-300 totaltax">
-                {{ $currency }} {{ $data->tax_total }}
+                {{ $currency }}
+                @php
+                    if($data->price_total > 0){
+                        echo $data->tax_total;
+                    }
+                    else{
+                        $data->tax_total = 0;
+                    }
+                @endphp
             </p>
         </div>
         <div class="flex justify-between">

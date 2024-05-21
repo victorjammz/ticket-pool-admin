@@ -11,7 +11,7 @@
             <div class="mt-5 w-full">
                 <form class="space-y-6" action="{{route('checkout_process')}}" method="POST">
                     @csrf
-                    <input type="hidden" name="totalAmountTax" id="totalAmountTax" value="{{ $data->totalAmountTax }}">
+                    <input type="hidden" name="totalAmountTax" id="totalAmountTax" value="{{$data->price > 0 ? $data->totalAmountTax : $data->totalAmountTax = 0 }}">
                     <input type="hidden" name="totalPersTax" id="totalPersTax" value="{{ $data->totalPersTax }}">
                     <input type="hidden" name="flutterwave_key"
                            value="{{ \App\Models\PaymentSetting::find(1)->ravePublicKey }}">
@@ -37,7 +37,7 @@
                     <input type="hidden" name="price" id="ticket_price" value="">
 
                     {{-- <input type="hidden" name="tax" id="tax_total" value="{{ $data->type == 'free' ? 0 : $data->tax_total }}"> --}}
-                    <input type="hidden" name="tax" id="tax_total" value="{{ $data->tax_total }}">
+                    <input type="hidden" name="tax" id="tax_total" value="{{ $data->price > 0 ? $data->tax_total : $data->tax_total = 0 }}">
                     <input type="hidden" name="payment" id="payment"
                            value="{{ $data->price_total + $data->tax_total }}">
                     @php
@@ -90,6 +90,7 @@
                                     class="ml-2 h-5 w-5 mr-2   hover:border-gray-light focus:outline-none">
                             </div>
                         @else --}}
+                        @if($data->price_total > 0)
                         @if ($setting->paypal == 1)
                             <div
                                     class="  p-5 rounded-lg text-gray-100 w-full font-normal text-base leading-6 flex align-middle">
@@ -162,7 +163,7 @@
                                             alt="" class="object-contain"></label>
                             </div>
                         @endif
-
+@endif
                         {{-- @endif --}}
                     </div>
 
@@ -176,11 +177,19 @@
 {{--                        >--}}
 {{--                            {{ __('Place Order') }}--}}
 {{--                        </button>--}}
+                        @if($data->price_total > 0)
                         <button type="submit" id="form_submit"
                                 class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
                                 onclick="this.disabled = true;" style="cursor:pointer;">
                             {{ __('Place Order') }}
                         </button>
+                        @else
+                        <button type="submit"
+                                class="flex w-full justify-center rounded-md bg-black px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                                 style="cursor:pointer;">
+                            {{ __('Place Order') }}
+                        </button>
+                        @endif
                     </div>
                 </form>
             </div>

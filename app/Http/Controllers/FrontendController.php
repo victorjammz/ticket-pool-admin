@@ -1031,7 +1031,6 @@ class FrontendController extends Controller
     public function checkoutseatsio(Request $request)
     {
         $singleEvent = 1;
-
         $selectedSeats = json_decode($request->selectedSeats, true);
         if($selectedSeats)
         {
@@ -1129,7 +1128,11 @@ class FrontendController extends Controller
 //         return view('frontend.checkoutseatio', compact('data'));
         $request->session()->put('data', $data);
 
-
+        if(!($data->price > 0))
+        {
+            $request->session()->put('request', $data);
+            return \redirect()->route('stripe.success');
+        }
         if (Auth::guard('appuser')->check()) {
             return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
         } else {
@@ -2208,8 +2211,9 @@ class FrontendController extends Controller
         return response()->json(['id' => $session->id, 'status' => 200]);
     }
     public function stripeSuccess()
-    {       
+    {
         $request = Session::get('request');
+        $request['ticket_id'] = $request['ticket_id'] ?? $request['id'];
         $ticket = Ticket::findOrFail($request['ticket_id']);
         $ticketIds = null;
         if(!empty($request['selectedSeatsIo'])){
@@ -2217,7 +2221,6 @@ class FrontendController extends Controller
             $request['ticket_id'] = explode(',',$request['ticket_id'])[0];
             $ticket = Ticket::findOrFail($request['ticket_id']);
         }
-
         $event = Event::find($ticket->event_id);
         $org = User::find($event->user_id);
         $user = AppUser::find(Auth::guard('appuser')->user()->id);
@@ -2228,19 +2231,19 @@ class FrontendController extends Controller
         $data['order_status'] = 'Pending';
         $data['ticket_id'] = $request['ticket_id'];
         $data['ticket_id_mutiple'] = $ticketIds;
-        $data['quantity'] = $request['quantity'];
-        $data['payment_type'] = 'Stripe';
-        $data['payment'] = $request['payment'];
-        $data['tax'] = $request['tax'];
+        $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
+        $data['payment_type'] = isset($request['price']) && $request['price'] > 0 ? 'Stripe' : 'FREE';
+        $data['payment'] = isset($request['price']) && $request['price'] > 0 ? $request['payment'] : 0;
+        $data['tax'] = isset($request['price']) && $request['price'] > 0 ? $request['tax'] : 0;
         $data['coupon_id'] = $request['coupon_id'] ?? null;
         if ($request['payment_type'] == 'LOCAL') {
             $data['payment_status'] = 0;
         } else {
             $data['payment_status'] = 1;
         }
-
         $com = Setting::find(1, ['org_commission_type', 'org_commission']);
-        $p =   $request['payment'] - $request['tax'];
+
+        $p =   isset($request['payment']) ? $request['payment'] - $request['tax'] : 0;
         if ($request['payment_type'] == "FREE") {
             $data['org_commission']  = 0;
         } else {
@@ -2250,7 +2253,6 @@ class FrontendController extends Controller
                 $data['org_commission']  = $com->org_commission;
             }
         }
-
         if (isset($request['coupon_id'])) {
             $count = Coupon::find($request['coupon_id'])->use_count;
             $count = $count + 1;
@@ -2269,14 +2271,14 @@ class FrontendController extends Controller
                     $seat->update(['type' => 'occupied']);
                 }
             }
-        } 
+        }
         if(!empty($request['selectedSeatsIo']) && count(json_decode($request['selectedSeatsIo'],true)) > 0){
             $selectSeatsCode = json_decode($request['seatsIoIds'],true);
             $ticketIdArray = explode(',',$ticketIds);
             $allTickets = Ticket::whereIn('id',$ticketIdArray)->get();
             $selectedSeatsIocounts = json_decode($request['selectedSeatsIo'],true);
             $key = 0;
-            foreach($allTickets as $ticket){ 
+            foreach($allTickets as $ticket){
                 $totalTickets = $selectedSeatsIocounts[$ticket['ticket_key']]['count'];
                 for ($i = 1; $i <= $totalTickets; $i++) {
                     $child['ticket_number'] = uniqid();
@@ -2292,6 +2294,7 @@ class FrontendController extends Controller
         }else{
             if($request['quantity'])
             {
+                $request['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
                 for ($i = 1; $i <= $request['quantity']; $i++) {
                     $child['ticket_number'] = uniqid();
                     $child['ticket_id'] = $request['ticket_id'];

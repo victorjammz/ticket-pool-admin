@@ -11,7 +11,13 @@
             <div class="mt-5 w-full">
                 <form class="space-y-6" action="{{route('checkout_process')}}" method="POST">
                     @csrf
-                    <input type="hidden" name="totalAmountTax" id="totalAmountTax" value="{{$data->price > 0 ? $data->totalAmountTax : $data->totalAmountTax = 0 }}">
+                    @if(isset($data->price))
+                    <input type="hidden" name="totalAmountTax" id="totalAmountTax"
+                           value="{{ $data->price > 0 ? $data->totalAmountTax : 0 }}">
+                    @else
+                        <input type="hidden" name="totalAmountTax" id="totalAmountTax"
+                               value="{{ $data->totalAmountTax }}">
+                    @endif
                     <input type="hidden" name="totalPersTax" id="totalPersTax" value="{{ $data->totalPersTax }}">
                     <input type="hidden" name="flutterwave_key"
                            value="{{ \App\Models\PaymentSetting::find(1)->ravePublicKey }}">
@@ -23,7 +29,6 @@
                     <input type="hidden" name="seatsIoIds" id="seatsIoIds" value="{{ $data->seatsIoIds }}">
                     <input type="hidden" name="selectedSeatsIo" id="selectedSeatsIo"
                            value="{{ $data->selectedSeatsIo }}">
-
                     <input type="hidden" id="razor_key" name="razor_key"
                            value="{{ \App\Models\PaymentSetting::find(1)->razorPublishKey }}">
 
@@ -37,8 +42,12 @@
                     <input type="hidden" name="price" id="ticket_price" value="">
 
                     {{-- <input type="hidden" name="tax" id="tax_total" value="{{ $data->type == 'free' ? 0 : $data->tax_total }}"> --}}
+                    @if(isset($data->price))
                     <input type="hidden" name="tax" id="tax_total" value="{{ $data->price > 0 ? $data->tax_total : $data->tax_total = 0 }}">
-                    <input type="hidden" name="payment" id="payment"
+                    @else
+                    <input type="hidden" name="tax" id="tax_total" value="{{ $data->tax_total }}">
+                    @endif
+                        <input type="hidden" name="payment" id="payment"
                            value="{{ $data->price_total + $data->tax_total }}">
                     @php
                         $price = $data->price_total + $data->tax_total;

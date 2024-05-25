@@ -1127,8 +1127,7 @@ class FrontendController extends Controller
         }
 //         return view('frontend.checkoutseatio', compact('data'));
         $request->session()->put('data', $data);
-
-        if(!($data->price > 0))
+        if(isset($data->price) && !($data->price > 0))
         {
             $request->session()->put('request', $data);
             return \redirect()->route('stripe.success');

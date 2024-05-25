@@ -222,6 +222,12 @@
                 <div class="flex justify-between">
                     <p class="section-title font-semibold  text-3xl leading-9 text-black">{{ __('Tickets') }}</p>
                 </div>
+                @if(!empty($data->seatsio_eventId))
+                    <div class="flex justify-between">
+                        <p class="font-semibold  text-1xl leading-9 text-black">{{ __('Choose Your Seats Below') }}</p>
+                    </div>
+                @endif
+
                 <div
                     class="grid xl:grid-cols-4 xlg:grid-cols-3 xxmd:grid-cols-2 sm:grid-cols-2 msm:grid-cols-1 xxsm:grid-cols-1 pt-5 gap-5">
                     @if(!empty($data->seatsio_eventId))

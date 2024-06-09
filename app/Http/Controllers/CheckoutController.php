@@ -28,8 +28,12 @@ class CheckoutController extends Controller
     {
 
         if (Auth::guard('appuser')->check()) {
+            $singleEvent = 1;
             $data = $request->session()->get('data');
-            return view('frontend.checkout.paymentDetail', compact('data'));
+            if(isset($data->seatsIoIds)){
+                $singleEvent = 0;
+            }
+            return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
         }
         // Validate the form data
         $validatedData = $request->validate([
@@ -47,8 +51,10 @@ class CheckoutController extends Controller
             return redirect()->route('login.express');
         } else {
             $singleEvent = 1;
-
             $data = $request->session()->get('data');
+            if(isset($data->seatsIoIds)){
+            $singleEvent = 0;
+            }
             $request->session()->put('email', $email);
             // Email is new, move to detail page
             return view('frontend.checkout.detail', compact('data','singleEvent'));
@@ -63,6 +69,9 @@ class CheckoutController extends Controller
         }
         $phone = Country::get();
         $singleEvent = 1;
+        if(isset($data->seatsIoIds)){
+            $singleEvent = 0;
+        }
         return view('frontend.checkout.additionalDetail', compact('phone', 'data','singleEvent'));
     }
 

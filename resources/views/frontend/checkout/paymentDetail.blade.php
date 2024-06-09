@@ -208,4 +208,20 @@
             @include('frontend.checkout.ticketDetail')
         </div>
     </div>
+    <script>
+        // Function to update the quantity based on local storage or default to 1
+        function updateQuantity() {
+            var storedQuantity = localStorage.getItem('quantity');
+            var defaultQuantity = 1; // Default quantity if no value in local storage
+            var quantityToShow = storedQuantity ? parseInt(storedQuantity) : defaultQuantity;
+            $('#quantity').val(quantityToShow);
+        }
+
+        // Document ready function
+        $(document).ready(function() {
+            // Update the quantity on page load
+            updateQuantity();
+        });
+    </script>
+
 @endsection

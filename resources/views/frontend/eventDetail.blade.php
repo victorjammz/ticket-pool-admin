@@ -629,4 +629,8 @@
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ $gmapkey }}&callback=initMap"></script>
 
+    <script>
+        localStorage.clear();
+
+    </script>
 @endsection

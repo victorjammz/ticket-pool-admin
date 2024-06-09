@@ -1,6 +1,5 @@
 <div class="flex flex-row justify-between">
     <div class="flex flex-col" style="width:70%">
-
         <h4 class="relative font-bold"><span id="eventTitle"> {{ $data->event->name }}</span> &#x1F31E;</h4>
         <input type="hidden" name="event_id" id="event_id" value="{{ $data->event->id }}">
         <p id="order_date">{{ date('D, jS M \a\t g:ia', strtotime($data->event->start_time)) }}</p>
@@ -21,15 +20,22 @@
 <div class="w-full h-0.5 bg-black mt-5"></div>
 <div class="flex flex-col mt-5">
     <h2 class="font-bold text-2xl">Order Summary</h2>
-    @if(isset($singleEvent))
+{{--    @dd($singleEvent)--}}
+    @if(isset($singleEvent) && $singleEvent > 0)
         <div class="flex flex-row justify-between">
             <div class="ticket-name">
-{{--                @dd($data)--}}
-{{--                @foreach($data->ticket as $ticket)--}}
-                    <p class="rest-ticket" style="font-size: 16px; line-height: 2.5"> {{$data->event->name}} * 1</p>
-{{--                @endforeach--}}
+                <p class="rest-ticket" style="font-size: 16px; line-height: 2.5"> {{$data->event->name}} * <span id="quantityDisplay">1</span></p>
             </div>
-            <p id="total_price" class="price" style="font-size: 16px; line-height: 2.5">{{ $data->currency }}{{$data->price_total}}</p>
+            <p id="total_price" class="price" style="font-size: 16px; line-height: 2.5">{{ $data->currency }}<span id="totalAmountDisplay">{{$data->price_total}}</span></p>
+        </div>
+
+        <div class="flex flex-row justify-between">
+            <p id="total_price" class="price" style="font-size: 16px; line-height: 2.5">{{__('Quantity')}}</p>
+            <div class="ticket-name">
+                <button type="button" class="pls minus border-l dec qtybtn border-t border-b border-primary bg-primary-light text-primary hover:text-black-700 h-8 w-9 cursor-pointer"> - </button>&nbsp;
+                <input type="text" name="quantity" readonly value="1" class="left-mob" id="txtAcrescimo" style="width: 40px;height: 25px;padding-left: 10px;border:0px;">
+                <button type="button" class="pls altera border-r inc qtybtn border-t border-b border-primary bg-primary-light text-primary hover:text-black-700 h-8 w-9 cursor-pointer"> + </button>
+            </div>
         </div>
     @else
         <div class="flex flex-row justify-between">
@@ -76,10 +82,8 @@
         <div class="flex justify-between">
             <p class="font-normal text-lg leading-7 text-gray-200">
                 {{ __('Tickets amount') }}</p>
-            <p class="font-medium text-lg leading-7 text-gray-300">
-                {{-- @if ($data->seatmap_id == null) --}}
-                {{ $currency }} {{ $data->price_total }}
-                {{-- @endif --}}
+            <p id="ticketAmount" class="font-medium text-lg leading-7 text-gray-300">
+                {{ $currency }} <span id="ticketTotalAmount">{{ $data->price_total }}</span>
             </p>
         </div>
 
@@ -95,11 +99,9 @@
                    $totalAmount = $data->price_total + $data->tax_total;
                 @endphp
 
-                    {{ $currency }}<span class="subtotal">
-                    {{ $data->price_total + $data->tax_total }}
-                </span>
+                    {{ $currency }}<span id="totalWithTax">{{ $data->price_total + $data->tax_total }}</span>
                 {{-- @endif --}}
-                <input type="hidden" name="payment" value="{{$totalAmount}}">
+                <input type="hidden" name="payment" value="{{$totalAmount}}" id="hiddenTotalAmount">
             </p>
         </div>
 
@@ -167,6 +169,46 @@
                 $(".couponerror").html('<div class="text-danger ml-2">Please enter a coupon code.</div>');
             }
         });
+
+        function updateQuantityAndTotal(quantity) {
+            var unitPrice = parseFloat("{{ $data->price_total }}"); // Get the unit price
+            var taxTotal = parseFloat("{{ $data->tax_total }}"); // Get the tax total
+            var newTotalAmount = (unitPrice * quantity) + taxTotal; // Calculate total amount with tax
+
+            // Update the quantity input field and total amount display
+            $("#txtAcrescimo").val(quantity);
+            $("#quantityDisplay").text(quantity);
+            $("#totalAmountDisplay").text((unitPrice * quantity).toFixed(2));
+            $("#ticketTotalAmount").text((unitPrice * quantity).toFixed(2));
+            $("#totalWithTax").text(newTotalAmount.toFixed(2));
+
+            // Update total amount in hidden input field
+            $("input[name='payment']").val(newTotalAmount);
+        }
+
+        $('.pls.altera').click(function() {
+            var curr_quantity = parseInt($("#txtAcrescimo").val());
+            curr_quantity += 1;
+            updateQuantityAndTotal(curr_quantity);
+            // Store the updated quantity in local storage
+            localStorage.setItem('quantity', curr_quantity);
+        });
+
+        $('.pls.minus').click(function() {
+            var curr_quantity = parseInt($("#txtAcrescimo").val());
+            if (curr_quantity > 1) {
+                curr_quantity -= 1;
+                updateQuantityAndTotal(curr_quantity);
+                // Store the updated quantity in local storage
+                localStorage.setItem('quantity', curr_quantity);
+            }
+        });
+        var storedQuantity = localStorage.getItem('quantity');
+        if (storedQuantity) {
+            // Update quantity and total amount with stored value
+            updateQuantityAndTotal(parseInt(storedQuantity));
+        }
     });
+
 
 </script>

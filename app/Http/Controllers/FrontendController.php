@@ -199,6 +199,9 @@ class FrontendController extends Controller
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         $data = session()->get('data');
         $singleEvent = 1;
+        if(isset($data->seatsIoIds)){
+            $singleEvent = 0;
+        }
         return view('frontend.auth.login_express',compact('data','singleEvent'));
     }
     public function userLogin(Request $request)
@@ -288,6 +291,10 @@ class FrontendController extends Controller
                 if (!$setting->user_verify) {
                     $data = $request->session()->get('data');
                     $singleEvent = 1;
+                    if(isset($data->seatsIoIds))
+                    {
+                        $singleEvent = 0;
+                    }
                     return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
 
                 } else {
@@ -429,6 +436,9 @@ class FrontendController extends Controller
                 }
                 $data = $request->session()->get('data');
                 $singleEvent = 1;
+                if(isset($data->seatsIoIds)){
+                    $singleEvent = 0;
+                }
                 if (Auth::guard('appuser')->check()) {
                     return view('frontend.checkout.paymentDetail', compact('data','singleEvent'));
                 }
@@ -1039,6 +1049,7 @@ class FrontendController extends Controller
                 // Apply the where condition on the ticket relationship
                 $query->whereIn('ticket_key', $seatKeys);
             }])->where('seatsio_eventId', $request->seatsio_eventId)->first();
+            $singleEvent = 0;
         }
         else{
            $eventDetails = $request->session()->get('data');
@@ -2230,7 +2241,11 @@ class FrontendController extends Controller
         $data['order_status'] = 'Pending';
         $data['ticket_id'] = $request['ticket_id'];
         $data['ticket_id_mutiple'] = $ticketIds;
-        $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
+        if($request['quantity'] > 1){
+            $data['quantity'] =  $request['quantity'];
+        }else{
+            $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
+        }
         $data['payment_type'] = isset($request['price']) && $request['price'] > 0 ? 'Stripe' : 'FREE';
         $data['payment'] = isset($request['price']) && $request['price'] > 0 ? $request['payment'] : 0;
         $data['tax'] = isset($request['price']) && $request['price'] > 0 ? $request['tax'] : 0;
@@ -2293,7 +2308,11 @@ class FrontendController extends Controller
         }else{
             if($request['quantity'])
             {
-                $request['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
+                if($request['quantity'] > 1){
+                    $data['quantity'] =  $request['quantity'];
+                }else{
+                    $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
+                }
                 for ($i = 1; $i <= $request['quantity']; $i++) {
                     $child['ticket_number'] = uniqid();
                     $child['ticket_id'] = $request['ticket_id'];

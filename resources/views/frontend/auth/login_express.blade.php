@@ -35,7 +35,7 @@
                 @endif
             </div>
         </div>
-        <div class="flex min-h-full flex-col px-6 py-12 h-120 relative msm:w-1/2" style="box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);">
+        <div class="flex min-h-full flex-col px-6 py-12 h-130 relative msm:w-1/2" style="box-shadow: 0px 8px 8px rgba(0, 0, 0, 0.1);">
             @include('frontend.checkout.ticketDetail')
         </div>
     </div>

@@ -20,6 +20,7 @@
 <div class="w-full h-0.5 bg-black mt-5"></div>
 <div class="flex flex-col mt-5">
     <h2 class="font-bold text-2xl">Order Summary</h2>
+{{--    <span>Needs to update Height if needeed</span>--}}
 {{--    @dd($singleEvent)--}}
     @if(isset($singleEvent) && $singleEvent > 0)
         <div class="flex flex-row justify-between">

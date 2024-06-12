@@ -285,7 +285,7 @@ class UserController extends Controller
         $data['customer_id'] = $user;
         $data['organization_id'] = $org->id;
         $data['order_status'] = 'Pending';
-
+        $data['payment_type'] = 'FREE';
         $order = Order::create($data);
         if (isset($request->tax_data)) {
             foreach (json_decode($data['tax_data']) as $value) {
@@ -295,6 +295,7 @@ class UserController extends Controller
                 OrderTax::create($tax);
             }
         }
+
         return redirect('orders');
     }
     public function adminDashboard(Request $request)

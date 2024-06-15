@@ -193,6 +193,7 @@
             updateQuantityAndTotal(curr_quantity);
             // Store the updated quantity in local storage
             localStorage.setItem('quantity', curr_quantity);
+            window.location.reload();
         });
 
         $('.pls.minus').click(function() {
@@ -203,6 +204,7 @@
                 // Store the updated quantity in local storage
                 localStorage.setItem('quantity', curr_quantity);
             }
+            window.location.reload();
         });
         var storedQuantity = localStorage.getItem('quantity');
         if (storedQuantity) {

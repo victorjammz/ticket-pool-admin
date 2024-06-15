@@ -1053,6 +1053,7 @@ class FrontendController extends Controller
         }
         else{
            $eventDetails = $request->session()->get('data');
+           $eventDetails->quantity = $request->quantity;
         }
         // $seatsIoIds = json_decode($request->seatsIoIds,true);
 
@@ -1136,6 +1137,7 @@ class FrontendController extends Controller
         else{
             $data = $eventDetails;
         }
+//        dd($data);
 //         return view('frontend.checkoutseatio', compact('data'));
         $request->session()->put('data', $data);
         if(isset($data->price) && !($data->price > 0))

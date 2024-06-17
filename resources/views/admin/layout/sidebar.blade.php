@@ -83,7 +83,15 @@
             @can('email_access')
                 <li class="{{ request()->is('email*') ? 'active' : '' }}">
                     <a class="nav-link" href="{{ url('email') }}">
-                        <i class="fas fa-envelope"></i> <span>{{ __('Email Notofications') }}</span>
+                        <i class="fas fa-envelope"></i> <span>{{ __('Email Notifications') }}</span>
+                    </a>
+                </li>
+            @endcan
+
+            @can('Book_tickets')
+                <li class="{{ request()->is('buy-ticket') ? 'active' : '' }}">
+                    <a class="nav-link" href="{{ url('buy-ticket') }}">
+                        <i class="fas fa-ticket-alt"></i> <span>{{ __('Buy Admin Ticket') }}</span>
                     </a>
                 </li>
             @endcan

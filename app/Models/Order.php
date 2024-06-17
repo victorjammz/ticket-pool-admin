@@ -31,6 +31,7 @@ class Order extends Model
         'seat_details',
         'book_seats',
         'ticket_id_mutiple',
+        'buy_admin',
     ];
 
     protected $table = 'orders';
@@ -66,6 +67,11 @@ class Order extends Model
     public function getReviewAttribute()
     {
         return Review::where('order_id',$this->attributes['id'])->first();
+    }
+
+    public function childOrder()
+    {
+        return $this->hasOne(OrderChild::class, 'order_id', 'id');
     }
 
    

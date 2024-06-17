@@ -15,6 +15,7 @@ class OrderChild extends Model
         'ticket_number',
         'status',
         'ticket_date',
+        'buy_admin',
         'ticket_number_seatsio'
     ];
 
@@ -27,5 +28,10 @@ class OrderChild extends Model
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

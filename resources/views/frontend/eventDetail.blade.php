@@ -365,7 +365,7 @@
                                                 {{ $item->price }}</p>
                                         </div>
                                         <div class="py-4 flex justify-center">
-                                            @if ($item->available_qty < 0)
+                                            @if ($item->available_qty <= 0)
                                                 <p class="paid-tag available-ticket text-center py-2 just-center w-fit">
                                                     {{ __('Sold Out') }}</p>
                                             @else

@@ -76,6 +76,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/organization/home', [UserController::class, 'organizationDashboard']);
     Route::get('/{id}/{name}/tickets', [TicketController::class, 'index']);
     Route::get('/book-ticket', [UserController::class, 'bookTicket']);
+
+    /**
+     * Buy Tickets by Admin
+     */
+    Route::get('/buy-ticket', [UserController::class, 'buyTicket']);
+    Route::post('/buy-ticket-admin', [UserController::class, 'buyTicketAdmin']);
+
     Route::get('/organizer/{id}/{name}', [UserController::class, 'organizerEventDetails']);
     Route::get('/organizerCheckout/{id}', [UserController::class, 'organizerCheckout']);
     Route::post('/organizerCreateOrder', [UserController::class, 'organizerCreateOrder']);

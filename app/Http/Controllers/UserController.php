@@ -2,6 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TicketBook;
+use App\Models\Notification;
+use App\Models\NotificationTemplate;
+use App\Models\OrderChild;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Validation\Rule;
 use App\Models\User;
 use App\Models\Event;
@@ -739,4 +746,116 @@ class UserController extends Controller
         $key = OrganizerPaymentKeys::where('organizer_id', $request->id)->first()->stripePublicKey;
         return response()->json(['key' => $key, 'status' => 200]);
     }
+
+
+    public function buyTicket(): Factory|\Illuminate\Contracts\View\View|array|Application
+    {
+        $tickets = Ticket::where('status',1)->where('is_deleted',0)->get();
+        $orders = Order::get();
+        $orderChild = OrderChild::with('order')->where('buy_admin',1)->pluck('order_id');
+        $ordersByAdmin = Order::with(['event', 'ticket', 'customer'])
+            ->whereIn('id',$orderChild)
+            ->get();
+        return view('admin.admin_buy_tickets.admin_buy_ticket', compact('ordersByAdmin','tickets','orders'));
+    }
+
+    public function buyTicketAdmin(Request $request)
+    {
+        $order = Order::where('id',$request->order_id)->first();
+//       $email = $request->email;
+//       $quantity = $request->quantity;
+//       $ticketID = $request->ticket;
+//       $ticket = Ticket::find($ticketID);
+//       $appUser = AppUser::where('email',$email)->first();
+//       $adminUser = User::where('email',$email)->first();
+//       if($appUser)
+//       {
+//           $userID = $appUser->id;
+//       }elseif($adminUser)
+//       {
+//           $userID = $adminUser->id;
+//       }
+        $childOrderIds = [];
+        for ($i = 1; $i <= $request['quantity']; $i++) {
+            $child['ticket_number'] = uniqid();
+            $child['ticket_id'] = $order->ticket_id;
+            $child['order_id'] = $order->id;
+            $child['buy_admin'] = 1;
+            $child['customer_id'] = $order->customer_id;
+            $childOrderIds[] = OrderChild::create($child)->id;
+        }
+        $order->quantity = $order->quantity +=$request['quantity'];
+        $order->save();
+        $user = AppUser::find($order->customer_id);
+        $setting = Setting::find(1);
+
+        // for user notification
+        $message = NotificationTemplate::where('title', 'Book Ticket')->first()->message_content;
+        $detail['user_name'] = $user->name . ' ' . $user->last_name;
+        $detail['quantity'] = $request['quantity'];
+        $detail['event_name'] = Event::find($order->event_id)->name;
+        $detail['date'] = Event::find($order->event_id)->start_time->format('d F Y h:i a');
+        $detail['app_name'] = $setting->app_name;
+        $noti_data = ["{{user_name}}", "{{quantity}}", "{{event_name}}", "{{date}}", "{{app_name}}"];
+        $message1 = str_replace($noti_data, $detail, $message);
+        $notification = array();
+        $notification['organizer_id'] = null;
+        $notification['user_id'] = $user->id;
+        $notification['order_id'] = $order->id;
+        $notification['title'] = 'Ticket Booked';
+        $notification['message'] = $message1;
+        Notification::create($notification);
+        if ($setting->push_notification == 1) {
+            if ($user->device_token != null) {
+                (new AppHelper)->sendOneSignal('user', $user->device_token, $message1);
+            }
+        }
+        // for user mail
+        $ticket_book = NotificationTemplate::where('title', 'Book Ticket')->first();
+        $details['user_name'] = $user->name . ' ' . $user->last_name;
+        $details['quantity'] = $request['quantity'];
+        $details['event_name'] = Event::find($order->event_id)->name;
+        $details['date'] = Event::find($order->event_id)->start_time->format('d F Y h:i a');
+        $details['app_name'] = $setting->app_name;
+        if ($setting->mail_notification == 1) {
+            try {
+                $qrcode = $order->order_id;
+                Mail::to($user->email)->send(new TicketBook($ticket_book->mail_content, $details, $ticket_book->subject, $qrcode));
+            } catch (\Throwable $th) {
+                Log::info($th->getMessage());
+            }
+            $this->sendMail($order->id);
+        }
+        return response()->json(['message' => 'Ticket Ordered Successfully', 'status' => 200]);
+
+
+    }
+
+
+    public function sendMail($id): bool
+    {
+        $order = Order::with(['customer', 'event', 'organization', 'ticket'])->find($id);
+        $order->tax_data = OrderTax::where('order_id', $order->id)->get();
+        $order->ticket_data = OrderChild::where('order_id', $order->id)->get();
+        $customPaper = array(0, 0, 720, 1440);
+        $pdf = FacadePdf::loadView('ticketmail', compact('order'))->save(public_path("ticket.pdf"))->setPaper($customPaper, $orientation = 'portrait');
+        $data["email"] = $order->customer->email;
+        $data["title"] = "Ticket PDF";
+        $data["body"] = "";
+        $tempp = $pdf->output();
+        $sender = Setting::select('sender_email', 'app_name')->first();
+        try {
+            Mail::send('mail', $data, function ($message) use ($data, $tempp, $sender) {
+                $message->from($sender->sender_email, $sender->app_name)
+                    ->to($data["email"])
+                    ->subject($data["title"])
+                    ->attachData($tempp, "ticket.pdf");
+            });
+        } catch (Throwable $th) {
+            Log::info($th->getMessage());
+        }
+        return true;
+    }
+
+
 }

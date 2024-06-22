@@ -390,7 +390,7 @@
                                     </div>
 
 
-                                    @if ($item->available_qty == 0)
+                                    @if ($item->available_qty <= 0)
                                         <div class="absolute bottom-5" style="width: 89%">
                                             <div class="mt-7  w-full border border-primary rounded-lg flex justify-center">
                                                 <a href="#"

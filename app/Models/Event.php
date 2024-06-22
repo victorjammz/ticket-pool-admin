@@ -99,9 +99,9 @@ class Event extends Model
     }
 
     // Define accessor for sold tickets price
-    public function getSoldTicketsPriceAttribute(): int
+    public function getSoldTicketsPriceAttribute(): float
     {
-        return intval(Order::where('event_id', $this->id)->sum('payment'));
+        return floatval(Order::where('event_id', $this->id)->sum('payment'));
     }
     public function getSendAmountAttribute(): int
     {

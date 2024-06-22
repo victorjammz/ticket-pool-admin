@@ -2250,7 +2250,7 @@ class FrontendController extends Controller
             $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
         }
         $data['payment_type'] = isset($request['price']) && $request['price'] > 0 ? 'Stripe' : 'FREE';
-        $data['payment'] = isset($request['price']) && $request['price'] > 0 ? $request['payment'] : 0;
+        $data['payment'] = isset($request['price']) && $request['price'] > 0 ? 0 : $request['payment'];
         $data['tax'] = isset($request['price']) && $request['price'] > 0 ? $request['tax'] : 0;
         $data['coupon_id'] = $request['coupon_id'] ?? null;
         if ($request['payment_type'] == 'LOCAL') {

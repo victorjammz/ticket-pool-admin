@@ -101,6 +101,7 @@ class EventController extends Controller
                 $value->scanner = User::find($value->scanner_id);
             }
         }
+//        dd($events[0]->sold_tickets_price);
         return view('admin.event.index', compact('events'));
     }
 

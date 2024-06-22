@@ -75,22 +75,22 @@
                             </div>
                             <div class="simplified-organizer-info__details" data-testid="organizer-info-details">
                                 <span class="simplified-organizer-info__name-by">By <strong class="simplified-organizer-info__name-link">{{ $data->organization->first_name .' '. $data->organization->last_name }}</strong></span>
-                                <div class="organizer-stats organizer-stats--condensed-full-width">
-                                    <div data-testid="followers-count"><span class="organizer-stats__highlight">{{ $data->followers }}</span> <span class="organizer-stats__suffix">followers</span>
-                                        @if (Auth::guard('appuser')->check())
-                                        @php
-                                            $userId = Auth::guard('appuser')->id();
-                                            $eventId = $data->id;
-                                            $hasFollowed = \App\Helpers\Misc::hasUserFollowedEvent($userId, $eventId);
-                                        @endphp
-                                        @if ($hasFollowed)
-                                        <a href="{{ route('unfollow.event', $eventId) }}" class="cursor-pointer mt-1 px-3 py-2 ml-5 text-white text-sm bg-primary text-center font-poppins font-normal text-base leading-6 rounded-md">Unfollow</a>
-                                            @else
-                                                <a href="{{ route('follow.event', $eventId) }}" class="cursor-pointer mt-1 px-3 py-2 ml-5 text-white text-sm bg-primary text-center font-poppins font-normal text-base leading-6 rounded-md">Follow</a>
-                                            @endif
-                                        @endif
-                                    </div>
-                                </div>
+{{--                                <div class="organizer-stats organizer-stats--condensed-full-width">--}}
+{{--                                    <div data-testid="followers-count"><span class="organizer-stats__highlight">{{ $data->followers }}</span> <span class="organizer-stats__suffix">followers</span>--}}
+{{--                                        @if (Auth::guard('appuser')->check())--}}
+{{--                                        @php--}}
+{{--                                            $userId = Auth::guard('appuser')->id();--}}
+{{--                                            $eventId = $data->id;--}}
+{{--                                            $hasFollowed = \App\Helpers\Misc::hasUserFollowedEvent($userId, $eventId);--}}
+{{--                                        @endphp--}}
+{{--                                        @if ($hasFollowed)--}}
+{{--                                        <a href="{{ route('unfollow.event', $eventId) }}" class="cursor-pointer mt-1 px-3 py-2 ml-5 text-white text-sm bg-primary text-center font-poppins font-normal text-base leading-6 rounded-md">Unfollow</a>--}}
+{{--                                            @else--}}
+{{--                                                <a href="{{ route('follow.event', $eventId) }}" class="cursor-pointer mt-1 px-3 py-2 ml-5 text-white text-sm bg-primary text-center font-poppins font-normal text-base leading-6 rounded-md">Follow</a>--}}
+{{--                                            @endif--}}
+{{--                                        @endif--}}
+{{--                                    </div>--}}
+{{--                                </div>--}}
                             </div>
 
                         </div>
@@ -174,10 +174,10 @@
                                         </p>
                                     </div>
 
-                                    <div class="followers-count">
-                                        <span class="organizer-stats__highlight text-center">{{ $data->followers }}</span>
-                                        <span class="organizer-stats__suffix text-center">followers</span>
-                                    </div>
+{{--                                    <div class="followers-count">--}}
+{{--                                        <span class="organizer-stats__highlight text-center">{{ $data->followers }}</span>--}}
+{{--                                        <span class="organizer-stats__suffix text-center">followers</span>--}}
+{{--                                    </div>--}}
                                 </div>
                             </a>
                         </div>

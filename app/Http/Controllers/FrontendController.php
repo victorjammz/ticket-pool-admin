@@ -873,7 +873,8 @@ class FrontendController extends Controller
         SEOTools::jsonLd()->addImage($setting->imagePath . $setting->logo);
         SEOTools::jsonLd()->addImage($data->imagePath . $data->image);
         $timezone = Setting::find(1)->timezone;
-        $date = Carbon::now($timezone);
+//        $date = Carbon::now($timezone);
+        $date = Carbon::now();
         $data->free_ticket = Ticket::where([['event_id', $data->id], ['is_deleted', 0], ['type', 'free'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
         $data->paid_ticket = Ticket::where([['event_id', $data->id], ['is_deleted', 0], ['type', 'paid'], ['status', 1], ['end_time', '>=', $date->format('Y-m-d H:i:s')], ['start_time', '<=', $date->format('Y-m-d H:i:s')]])->orderBy('id', 'DESC')->get();
         $data->review = Review::where('event_id', $data->id)->orderBy('id', 'DESC')->get();

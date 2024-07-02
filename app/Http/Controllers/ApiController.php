@@ -1081,6 +1081,7 @@ class ApiController extends Controller
         }
         return response()->json(['success' => true, 'msg' => 'Notification deleted successfully.'], 200);
     }
+
     public function user_delete($id)
     {
         $time = Carbon::now();
@@ -1089,7 +1090,7 @@ class ApiController extends Controller
         $app_user['name'] = 'User Deleted';
         $app_user['last_name'] = 'Deleted';
         $app_user['status'] = 0;
-        $app_user['email'] =  $time->timestamp . '@deleteduser.com';
+        $app_user['email'] = $time->timestamp . '@deleteduser.com';
         $app_user->update();
         $app_user->delete();
         return response()->json(['success' => true, 'msg' => 'Account deleted successfully.'], 200);

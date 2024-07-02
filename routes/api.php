@@ -62,7 +62,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['auth:userApi']], function ()
     Route::post('/add-review', [ApiController::class, 'addReview']);
     Route::post('/change-password', [ApiController::class, 'changePassword']);
     Route::get('/clear-notification', [ApiController::class, 'clearNotification']);
-    Route::get('/user_delete_self/{id}', [ApiController::class, 'user_delete']);
+    Route::post('/user_delete_self/{id}', [ApiController::class, 'user_delete']);
     // Wallet
     Route::get('/get-wallet',[ApiController::class,'getBalance'])->name('getBalance');
     Route::post('/wallet-deposit',[ApiController::class,'deposit'])->name('deposit');

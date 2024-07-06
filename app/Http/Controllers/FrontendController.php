@@ -121,7 +121,7 @@ class FrontendController extends Controller
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]])
-                ->orderBy('start_time', 'desc')->get();
+                ->orderBy('start_time', 'asc')->get();
             $organizer = User::role('Organizer')->orderBy('id', 'DESC')->get();
             $category = Category::where('status', 1)->orderBy('id', 'DESC')->get();
             $blog = Blog::with(['category:id,name'])->where('status', 1)->orderBy('id', 'DESC')->get();

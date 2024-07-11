@@ -45,7 +45,7 @@
                                     <th>Ticket Type</th>
                                     <th>Ticket Quantity</th>
                                     <th>Ticket Price</th>
-                                    <th>Customer Email</th>
+{{--                                    <th>Customer Email</th>--}}
 {{--                                    <th>Action</th>--}}
                                 </tr>
                             </thead>
@@ -59,7 +59,7 @@
                                        <td>{{ $item->ticket->type }}</td>
                                        <td>{{ $item->quantity }}</td>
                                        <td>{{ $item->ticket->price }}</td>
-                                       <td>{{ $item->customer->email }}</td>
+{{--                                       <td>{{ $item->customer->email }}</td>--}}
 {{--                                       <td><a href="{{ url('organizerCheckout/' . $item->id) }}"><button class="btn btn-a btn-primary">{{ __('Book Now') }}</button></a></td>--}}
                                 </tr>
                                 @endforeach

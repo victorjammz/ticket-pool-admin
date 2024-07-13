@@ -2196,8 +2196,8 @@
                             <i class="fas fa-solid fa-users"></i>
                         </div>
                         <div class="card-body">
-                            <h4>{{ __('Organizer About Us') }}</h4>
-                            <p>{{ __('Describe about the Organizer') }}</p>
+                            <h4>{{ __('Sell Tickets') }}</h4>
+                            <p>{{ __('Describe about the Sell Tickets') }}</p>
                             <a href="#OrgAboutUs" aria-controls="additional-setting" role="button"
                                data-toggle="collapse" class="card-cta" aria-expanded="false">{{ __('Change Setting') }}
                                 <i class="fas fa-chevron-right"></i></a>
@@ -2205,8 +2205,8 @@
                                 <form method="post" action="{{ url('org-about-us') }}">
                                     @csrf
                                     <div class="form-group">
-                                        <label>{{ __('Organizer About Us') }}</label>
-                                        <textarea name="org_about_us" Placeholder="{{ __('About the organization') }}"
+                                        <label>{{ __('Sell Tickets') }}</label>
+                                        <textarea name="org_about_us" Placeholder="{{ __('About the Sell Tickets') }}"
                                                   class="textarea_editor @error('org_about_us') is-invalid @enderror">{{ $setting->org_about_us }}</textarea>
                                         @error('org_about_us')
                                         <div class="invalid-feedback block">{{ $message }}</div>

@@ -56,6 +56,11 @@
                                 <a href="{{ url('/all-events') }}" class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Events') }}</a>
                             </div>
                         </li>
+                        <li class="xxsm:max-lg:hidden nav-item {{ Request::is('sell-tickets') ? 'active' : '' }}">
+                            <div class="relative inline-block text-left">
+                                <a href="{{ url('/sell-tickets') }}" class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Sell Tickets') }}</a>
+                            </div>
+                        </li>
                         <li class="xxsm:max-lg:hidden nav-item {{ Request::is('all-category') ? 'active' : '' }} ">
                             <div class="relative inline-block text-left">
                                 <a href="#"
@@ -183,6 +188,10 @@
                         <a href="{{ url('/all-events') }}"
                             class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Events') }}</a>
                     </li>
+                    <li class="mt-2 nav-item {{ Request::is('sell-tickets') ? 'active' : '' }}">
+                        <a href="{{ url('/sell-tickets') }}"
+                            class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Sell Tickets') }}</a>
+                    </li>
                     <li class="mt-2 nav-item {{ Request::is('all-category') ? 'active' : '' }} ">
                         <div class="relative inline-block text-left">
                             <a type="button" href="#"
@@ -261,6 +270,10 @@
                 <li class="mt-2 nav-item {{ Request::is('all-events') ? 'active' : '' }}">
                     <a href="{{ url('/all-events') }}"
                         class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Events') }}</a>
+                </li>
+                <li class="mt-2 nav-item {{ Request::is('sell-tickets') ? 'active' : '' }}">
+                    <a href="{{ url('/sell-tickets') }}"
+                        class="nav-link md:px-1 capitalize font-poppins font-normal text-base leading-6 text-gray">{{ __('Sell Tickets') }}</a>
                 </li>
                 <li class="mt-2 nav-item {{ Request::is('all-category') ? 'active' : '' }} ">
                     <div class="relative inline-block text-left">

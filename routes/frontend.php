@@ -17,7 +17,7 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
     Route::get('/', [FrontendController::class, 'home'])->name('home');
     Route::post('/send-to-admin', [FrontendController::class, 'sentMessageToAdmin']);
     Route::get('/privacy_policy', [FrontendController::class, 'privacypolicy']);
-    Route::get('/org-about-us', [FrontendController::class, 'orgAboutUs'])->name('about.us');
+    Route::get('/sell-tickets', [FrontendController::class, 'orgAboutUs'])->name('sell.tickets');
     Route::get('/FAQ', [FaqController::class, 'show']);
     Route::get('/appuser-privacy-policy', [FrontendController::class, 'appuserPrivacyPolicyShow'])->name('app.user.privacy.policy');
     Route::get('/appuser-terms-conditions', [FrontendController::class, 'appUserTermsAndConditions'])->name('app.user.terms.conditions');

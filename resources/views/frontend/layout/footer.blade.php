@@ -21,12 +21,12 @@
 
                     </a>
                 </li>
-                <li class="mt-2">
-                    <a href="{{ url('/org-about-us') }}"
-                       class="md:px-3 capitalize font-poppins font-normal text-base leading-6 text-white flex">{{ __('About Us') }}
+{{--                <li class="mt-2">--}}
+{{--                    <a href="{{ url('/sell-tickets') }}"--}}
+{{--                       class="md:px-3 capitalize font-poppins font-normal text-base leading-6 text-white flex">{{ __('Sell Tickets') }}--}}
 
-                    </a>
-                </li>
+{{--                    </a>--}}
+{{--                </li>--}}
                 <li class="mt-2">
                     <a href="{{ url('/contact') }}"
                         class="md:px-3 capitalize font-poppins font-normal text-base leading-6 text-white">{{ __('Contact') }}</a>

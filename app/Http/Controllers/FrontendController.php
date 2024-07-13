@@ -2012,7 +2012,7 @@ class FrontendController extends Controller
 
     public function privacypolicy()
     {
-        $policy = Setting::find(1)->privacy_policy_organizer;
+        $policy = Setting::find(1)->appuser_privacy_policy;
         return view('frontend.privacy-policy', compact('policy'));
     }
 

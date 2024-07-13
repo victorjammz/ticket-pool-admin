@@ -2016,6 +2016,11 @@ class FrontendController extends Controller
         return view('frontend.privacy-policy', compact('policy'));
     }
 
+    public function orgAboutUs()
+    {
+        $orgAboutUs = Setting::find(1)->org_about_us;
+        return view('frontend.about-us', compact('orgAboutUs'));
+    }
     public function appuserPrivacyPolicyShow(Request $request)
     {
         $policy = Setting::find(1)->appuser_privacy_policy;

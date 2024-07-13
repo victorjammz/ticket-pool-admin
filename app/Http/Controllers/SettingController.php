@@ -310,6 +310,11 @@ class SettingController extends Controller
         Setting::find(1)->update($request->all());
         return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
     }
+    public function organizerAboutUs(Request $request)
+    {
+        Setting::find(1)->update($request->all());
+        return redirect('admin-setting')->withStatus(__('Setting saved successfully.'));
+    }
     public function appUserTermsAndConditions(Request $request)
     {
         $data = TermsConditions::find(1);

@@ -158,6 +158,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/language/download_sample_file', [LanguageController::class, 'download_sample_file']);
     Route::get('/check-email', [UserController::class, 'check_email']);
     Route::post('/about_us', [SettingController::class, 'aboutUs']);
+    Route::post('/org-about-us', [SettingController::class, 'organizerAboutUs']);
     Route::get('/event/create', [EventController::class, 'create']);
     Route::get('/app_users_edit/{id}', [UserController::class, 'editAppUser']);
     Route::post('/update_appuser', [UserController::class, 'updateAppUser']);

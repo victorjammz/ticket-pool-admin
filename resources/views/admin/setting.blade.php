@@ -2193,6 +2193,40 @@
                 <div class="col-lg-6">
                     <div class="card card-large-icons">
                         <div class="card-icon bg-primary text-white">
+                            <i class="fas fa-solid fa-users"></i>
+                        </div>
+                        <div class="card-body">
+                            <h4>{{ __('Organizer About Us') }}</h4>
+                            <p>{{ __('Describe about the Organizer') }}</p>
+                            <a href="#OrgAboutUs" aria-controls="additional-setting" role="button"
+                               data-toggle="collapse" class="card-cta" aria-expanded="false">{{ __('Change Setting') }}
+                                <i class="fas fa-chevron-right"></i></a>
+                            <div class="collapse mt-3" id="OrgAboutUs">
+                                <form method="post" action="{{ url('org-about-us') }}">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label>{{ __('Organizer About Us') }}</label>
+                                        <textarea name="org_about_us" Placeholder="{{ __('About the organization') }}"
+                                                  class="textarea_editor @error('org_about_us') is-invalid @enderror">{{ $setting->org_about_us }}</textarea>
+                                        @error('org_about_us')
+                                        <div class="invalid-feedback block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
+                                        <div class="col-sm-12 col-md-7">
+                                            <button type="submit" class="btn btn-primary demo-button">{{ __('Save') }}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card card-large-icons">
+                        <div class="card-icon bg-primary text-white">
                             <i class="fas fa-image"></i>
                         </div>
                         <div class="card-body">

@@ -2254,9 +2254,10 @@ class FrontendController extends Controller
         }else{
             $data['quantity'] = isset($request['price']) && $request['price'] > 0 ? $request['quantity'] : 1;
         }
-        $data['payment_type'] = isset($request['price']) && $request['price'] > 0 ? 'Stripe' : 'FREE';
-        $data['payment'] = isset($request['price']) && $request['price'] > 0 ? 0 : $request['payment'];
-        $data['tax'] = isset($request['price']) && $request['price'] > 0 ? $request['tax'] : 0;
+        $data['payment_type'] = isset($request['payment']) && $request['payment'] > 0 ? 'Stripe' : 'FREE';
+        $data['payment'] = isset($request['payment']) && $request['payment'] > 0 ? $request['payment'] : "0.00" ;
+        $data['tax'] = isset($request['payment']) && $request['payment'] > 0 ? $request['tax'] : 0;
+        $data['payment'] = $data['payment'] > 0 ? $data['payment'] - $request['tax'] : $data['payment'];
         $data['coupon_id'] = $request['coupon_id'] ?? null;
         if ($request['payment_type'] == 'LOCAL') {
             $data['payment_status'] = 0;
@@ -2283,6 +2284,7 @@ class FrontendController extends Controller
 
         $data['book_seats'] = isset($request['selectedSeatsId']) ? $request['selectedSeatsId'] : null;
         $data['seat_details'] = isset($request['selectedSeats']) ? $request['selectedSeats'] : null;
+//        dd($data);
         $order = Order::create($data);
         $module = Module::where('module', 'Seatmap')->first();
         if ($module->is_enable == 1 && $module->is_install == 1) {

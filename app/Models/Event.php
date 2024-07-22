@@ -72,6 +72,10 @@ class Event extends Model
         return  intval(Order::where('event_id', $this->attributes['id'])->sum('quantity'));
         // return  Order::where('event_id', $this->attributes['id'])->sum('quantity');
     }
+    public function getTotalEarnWithFeeAttribute()
+    {
+        return Order::where('event_id', $this->attributes['id'])->sum(\DB::raw('payment + 2.4'));
+    }
 
     public function getRateAttribute()
     {

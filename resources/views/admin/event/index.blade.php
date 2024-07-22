@@ -43,6 +43,7 @@
                                         <th>{{ __('Number of People') }}</th>
                                         <th>{{ __('Category') }}</th>
                                         <th>{{ __('Total Earning') }}</th>
+                                        <th>{{ __('Total Earning(Fee)') }}</th>
                                         <th>{{ __('Send Amount') }}</th>
                                         @if (Auth::user()->hasRole('admin'))
                                             <th>{{ __('Organization') }}</th>
@@ -81,6 +82,7 @@
                                             <td>{{ $item->people }}</td>
                                             <td>{{ $item->category->name }}</td>
                                             <td>£ {{ number_format($item->sold_tickets_price,2) }}</td>
+                                            <td>£ {{ number_format($item->total_earn_with_fee,2) }}</td>
                                             <td>£ {{ number_format($item->send_amount,2) }}</td>
                                             @if (Auth::user()->hasRole('admin'))
                                                 <td>{{ $item->organization->first_name . ' ' . $item->organization->last_name }}

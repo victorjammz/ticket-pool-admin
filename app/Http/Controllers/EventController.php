@@ -31,6 +31,7 @@ class EventController extends Controller
             $date = Carbon::now($timezone);
             $events  = Event::with(['category:id,name'])
                 ->where([['status', 1], ['is_deleted', 0], ['event_status', 'Pending'], ['end_time', '>', $date->format('Y-m-d H:i:s')]]);
+//            dd($events->first()->total_earn_with_fee);
             $chip = array();
             if ($request->has('type') && $request->type != null) {
                 $chip['type'] = $request->type;

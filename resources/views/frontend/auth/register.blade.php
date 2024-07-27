@@ -184,7 +184,7 @@
                     <img src="{{ $setting->logo ? url('images/upload/' . $setting->logo) : asset('/images/logo.png') }}"
                         alt="logo" width="300" class="mb-4 mt-2 object-contain">
                     <h4 class="text-white font-weight-normal mb-4">{{ __('Create an account') }}</h4>
-                    <form class="need-validation" action="{{ url('user/register') }}" method="post">
+                    <form class="need-validation" action="{{ route('user.register.first') }}" method="post">
                         @csrf
                         <div class="form-group d-flex align-items-center justify-content-center user-organizer-options">
                             <div class="radio-wrapper d-flex flex-1 border justify-content-center border border-gray-ligh rounded-lg">

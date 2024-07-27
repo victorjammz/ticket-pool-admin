@@ -376,6 +376,123 @@ class FrontendController extends Controller
         $phone = Country::get();
         return view('frontend.auth.register', compact('logo', 'phone'));
     }
+    public function userRegisterFirst(Request $request)
+    {
+        $request->validate([
+            'name' => 'bail|required',
+            'last_name' => 'bail|required',
+            'email' => 'bail|required|email|unique:app_user|unique:users',
+            'phone' => 'bail|required|numeric',
+            'password' => 'bail|required|min:6',
+            'Countrycode' => 'bail|required'
+        ]);
+
+        $verify = Setting::first()->user_verify == 1 ? 0 : 1;
+        $data = $request->all();
+        $data['password'] = Hash::make($request->password);
+        $pwd = $request->password;
+        $data['image'] = "defaultuser.png";
+        $data['status'] = 1;
+        $data['provider'] = "LOCAL";
+        $data['language'] = Setting::first()->language;
+        $data['phone'] = "+" . $request->Countrycode . $request->phone;
+        $data['is_verify'] = $verify;
+        if ($data['user_type'] == 'organizer') {
+            $data['country'] = $request->Countrycode;
+            $data['first_name'] = $request->name;
+            unset($data['country_selector_code']);
+            unset($data['Gender']);
+            unset($data['Country']);
+            unset($data['City']);
+            unset($data['DateOfBirth']);
+            unset($data['is_verify']);
+            $user = User::create($data);
+            $user->assignRole('Organizer');
+            OrganizerPaymentKeys::create([
+                'organizer_id' => $user->id,
+            ]);
+        } else {
+            $user = AppUser::create($data);
+            $userdata = array(
+                'email' => $request->email,
+                'password' => $request->password,
+            );
+            Auth::guard('appuser')->attempt($userdata);
+            Auth::guard('appuser')->user();
+        }
+
+        if ($user->is_verify == 0) {
+
+            if (Setting::first()->verify_by == 'email' && Setting::first()->mail_host != NULL) {
+                $details = [];
+                if ($data['user_type'] == 'organizer') {
+                    $details = [
+                        'url' => url('organizer/VerificationConfirm/' .  $user->id)
+                    ];
+                } else {
+                    $details = [
+                        'url' => url('user/VerificationConfirm/' .  $user->id)
+                    ];
+                }
+                $data = $request->session()->get('data');
+                $singleEvent = 1;
+                if(isset($data->seatsIoIds)){
+                    $singleEvent = 0;
+                }
+                Mail::to($user->email)->send(new \App\Mail\VerifyMail($details));
+                return redirect('user/login')->with(['success' => "Verification link has been sent to your email. Please visit that link to complete the verification"]);
+            }
+            if (Setting::first()->verify_by == 'phone') {
+
+                $setting = Setting::first();
+                $otp = rand(100000, 999999);
+                $to = $user->phone;
+                $message = "Your phone verification code is $otp for $setting->app_name.";
+                if ($setting->enable_twillio == 1) {
+                    $twilio_sid = $setting->twilio_account_id;
+                    $twilio_token = $setting->twilio_auth_token;
+                    $twilio_phone_number = $setting->twilio_phone_number;
+                    try {
+                        $twilio = new Clients($twilio_sid, $twilio_token);
+                        $twilio->messages->create(
+                            $to,
+                            [
+                                'from' => $twilio_phone_number,
+                                'body' => $message,
+                            ]
+                        );
+                    } catch (\Throwable $th) {
+                        return redirect()->back()->with('error', 'Somthing Went Wrong');
+                    }
+                }
+                if ($setting->enable_vonage == 1) {
+                    $apiKey = $setting->vonege_api_key;
+                    $apiSecret = $setting->vonage_account_secret;
+                    $virtualNumber = $setting->vonage_sender_number;
+                    $response = Http::post('https://rest.nexmo.com/sms/json', [
+                        'api_key' => $apiKey,
+                        'api_secret' => $apiSecret,
+                        'to' => $to,
+                        'from' => $virtualNumber,
+                        'text' => $message,
+                    ]);
+                }
+                if ($data['user_type'] == 'organizer') {
+                    $user = User::find($user->id);
+                    $user->otp = $otp;
+                    $user->update();
+                    return redirect('organizer/otp-verify/' . $user->id)->with(['success' => "Phone verification code sent via SMS."]);
+                } else {
+                    $user = AppUser::find($user->id);
+                    $user->otp = $otp;
+                    $user->update();
+                    return redirect('user/otp-verify/' . $user->id)->with(['success' => "Phone verification code sent via SMS."]);
+                }
+            }
+        }
+        return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
+    }
+
     public function userRegister(Request $request)
     {
         $request->validate([
@@ -498,6 +615,17 @@ class FrontendController extends Controller
         }
         return redirect('user/login')->with(['success' => "Congratulations! Your account registration was successful. You can now log in to your account and start using our services. Thank you for choosing our platform"]);
     }
+
+
+    public function VerificationConfirm($id)
+    {
+        $approveUser = AppUser::find($id);
+        $approveUser->email_verified_at = now();
+        $approveUser->is_verify = 1;
+        $approveUser->save();
+        return \redirect()->route('user.login');
+    }
+
     public function LoginByMail($id)
     {
         $user = AppUser::find($id);

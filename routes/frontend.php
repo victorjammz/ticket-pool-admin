@@ -30,7 +30,9 @@ Route::group(['middleware' => ['mode', 'XSS']], function () {
     Route::group(['prefix' => 'user'], function () {
 
         Route::get('/VerificationConfirm/{id}/{checkout}', [FrontendController::class, 'LoginByMail']);
+        Route::get('/VerificationConfirm/{id}', [FrontendController::class, 'VerificationConfirm']);
         Route::get('/register', [FrontendController::class, 'register']);
+        Route::post('/register-first', [FrontendController::class, 'userRegisterFirst'])->name('user.register.first');
         Route::post('/register', [FrontendController::class, 'userRegister']);
         Route::get('/customRegister', [FrontendController::class, 'userRegister'])->name("user.customRegister");
         Route::get('/otp-verify/{userid}', [FrontendController::class, 'otpView']);

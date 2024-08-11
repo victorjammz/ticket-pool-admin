@@ -275,6 +275,13 @@
                                     return '£' + price;
                                 },
                                 showZoomOutButtonOnMobile: false,
+                                isObjectVisible: function(object, extraConfig) {
+                                    var invisibleSections = ['201', '203', '205', '206', '208', '210', '213', '214', '101', '103', '107', '108', '114'];
+                                    if(invisibleSections.indexOf(object.labels.section) != -1){
+                                       return false;
+                                    }
+                                    return true;
+                                },
                                 onObjectSelected: function (object) {
                                     // add the selected seat id to the array
                                     console.log('Selected Object:', object);

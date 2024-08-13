@@ -139,6 +139,49 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mt-10 bg-white">
+                        <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('About Event') }}</p>
+                        <div class="section-content">
+                            <p class="font-normal text-lg leading-7 text-gray pt-5">
+                                {!! $data->description !!}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-10 bg-white">
+                        <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('Tags') }}</p>
+                        <div class="tags pt-4">
+                            @foreach ($tags as $item)
+                                <a href="{{ url('/user/tag/' . $item) }}"
+                                    class="tag-item">{{ $item }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="mt-10 bg-white">
+                        <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('About the organiser') }}</p>
+                        <div class="mt-4 p-4 bg-white shadow-lg rounded-lg">
+                            <a href="{{ route('organizationDetails', ['id' => $data->organization->id]) }}">
+                                <div class="mt-3 flex flex-col items-center justify-center">
+                                    <div class="organization-image">
+                                        <img src="{{ url('images/upload/' . $data->organization->image) }}" class="bg-cover object-cover" alt="">
+                                    </div>
+                                    <div class="">
+                                        <p class="text-organize-by font-normal text-xs leading-4 text-gray-100 text-center">
+                                            {{ __('Organised by') }}
+                                        </p>
+                                        <p class="text-orgniaztaion leading-6 mb-10">
+                                            {{  ($data->organization->first_name ?? '') . ' ' . ($data->organization->last_name ?? '') }}
+                                        </p>
+                                    </div>
+
+{{--                                    <div class="followers-count">--}}
+{{--                                        <span class="organizer-stats__highlight text-center">{{ $data->followers }}</span>--}}
+{{--                                        <span class="organizer-stats__suffix text-center">followers</span>--}}
+{{--                                    </div>--}}
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
                 <div class="xxmd:w-1/3 xmd:w-full xxsm:w-full">
                     <div class="bg-white">
@@ -446,49 +489,6 @@
                 </form>
             </div>
             {{-- review --}}
-            <div class="mt-10 bg-white">
-                <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('About Event') }}</p>
-                <div class="section-content">
-                    <p class="font-normal text-lg leading-7 text-gray pt-5">
-                        {!! $data->description !!}
-                    </p>
-                </div>
-            </div>
-            <div class="mt-10 bg-white">
-                <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('Tags') }}</p>
-                <div class="tags pt-4">
-                    @foreach ($tags as $item)
-                        <a href="{{ url('/user/tag/' . $item) }}"
-                           class="tag-item">{{ $item }}
-                        </a>
-                    @endforeach
-                </div>
-            </div>
-            <div class="mt-10 bg-white">
-                <p class="section-title font-semibold text-2xl leading-8 text-black">{{ __('About the organiser') }}</p>
-                <div class="mt-4 p-4 bg-white shadow-lg rounded-lg">
-                    <a href="{{ route('organizationDetails', ['id' => $data->organization->id]) }}">
-                        <div class="mt-3 flex flex-col items-center justify-center">
-                            <div class="organization-image">
-                                <img src="{{ url('images/upload/' . $data->organization->image) }}" class="bg-cover object-cover" alt="">
-                            </div>
-                            <div class="">
-                                <p class="text-organize-by font-normal text-xs leading-4 text-gray-100 text-center">
-                                    {{ __('Organised by') }}
-                                </p>
-                                <p class="text-orgniaztaion leading-6 mb-10">
-                                    {{  ($data->organization->first_name ?? '') . ' ' . ($data->organization->last_name ?? '') }}
-                                </p>
-                            </div>
-
-                            {{--                                    <div class="followers-count">--}}
-                            {{--                                        <span class="organizer-stats__highlight text-center">{{ $data->followers }}</span>--}}
-                            {{--                                        <span class="organizer-stats__suffix text-center">followers</span>--}}
-                            {{--                                    </div>--}}
-                        </div>
-                    </a>
-                </div>
-            </div>
             <div class="mt-10 flex items-center">
                 <p class="section-title font-semibold text-2xl leading-7 text-black">{{ __('Reviews') }}</p>&nbsp;
                 <div class="section-content">

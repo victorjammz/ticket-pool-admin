@@ -249,7 +249,7 @@
                                 },
                                 isObjectVisible: function(object, extraConfig) {
 
-                                    var invisibleSections = ['201', '203', '205', '206', '208', '210', '213', '214', '101', '103', '107', '108', '114'];
+                                    var invisibleSections = ['201', '203', '205', '206', '208', '210', '213', '214', '209', '207', '212', '202'];
                                     if(invisibleSections.indexOf(object.labels.section) != -1){
                                        return false;
                                     }
